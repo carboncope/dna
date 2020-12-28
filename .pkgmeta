@@ -1,0 +1,8 @@
+package-as: dna
+enable-nolib-creation: no
+
+externals:
+
+ignore:
+    - README.md
+    - CHANGELOG.md

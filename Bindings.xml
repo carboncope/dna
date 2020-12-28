@@ -1,0 +1,5 @@
+<Bindings>
+  <Binding name="dna Toggle" runOnUp="true" category="BINDING_HEADER_dna">
+    dna.fToggle(keystate)
+  </Binding>
+</Bindings>

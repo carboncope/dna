@@ -1,0 +1,24 @@
+## Interface: 90002
+## Title: dna
+## Notes: Rotation manager addon
+## Author: carboncope
+## Version: 11
+## SavedVariables: dna_ace_db
+
+embeds.xml
+
+dna_enUS.lua
+
+dna.lua
+
+dna_Engine.lua
+dna_Events.lua
+dna_Criteria.lua
+dna_Utils.lua
+dna_AButtons.lua
+dna_UI_Options.lua
+dna_UI_Lists.lua
+dna_UI_Rotations.lua
+dna_UI_Actions.lua
+dna_ui_databroker.lua
+dna_UI.lua
