@@ -1,0 +1,5 @@
+1.0.14-alpha Trying to get curseforge packaging to work
+v13 Changed + fixed dna.GetUnitPower Fixed UNIT_SPELLCAST_START tracking to lists Fixed UNIT_SPELLCAST_CHANNEL_START tracking to lists Fixed UNIT_SPELLCAST_SUCCEEDED tracking to lists Fixed deleting list entries leaving a duplicate entry Added shift+left click on data broker menu to reloadui Added shift+right click on data broker menu to open debug Added Add to list functionality in list UI
+v12 githook testing
+v11 Initial commit to github
+Initial commit

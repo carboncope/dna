@@ -1207,7 +1207,7 @@ dna.D.criteria["d/unit/GetUnitPower"]={
 	a2l=L["d/common/power/l"],a2dv="Mana",a2tt=L["d/common/power/tt"],
 	a3l=L["d/common/co/l"],a3dv="<",a3tt=L["d/common/co/tt"],
 	a4l=L["d/common/count/l"],a4dv="0",a4tt=L["d/common/count/tt"],
-	f=function () return format('dna.GetUnitPower(%q,%s)%s%s', dna.ui["ebArg1"]:GetText(), dna.ui["ebArg2"]:GetText(), dna.ui["ebArg3"]:GetText(), dna.ui["ebArg4"]:GetText()) end,
+	f=function () return format('dna.GetUnitPower(%q,%q)%s%s', dna.ui["ebArg1"]:GetText(), dna.ui["ebArg2"]:GetText(), dna.ui["ebArg3"]:GetText(), dna.ui["ebArg4"]:GetText()) end,
 }
 tinsert( dna.D.criteriatree[UNIT_CRITERIA].children, { value='dna.CreateCriteriaPanel("d/unit/GetUnitPower")', text=L["d/unit/GetUnitPower"] } )
 ----------------------------------------------------------------------------------------------
@@ -1242,7 +1242,7 @@ end
 dna.D.criteria["d/unit/GetUnitPowerMax"]={
 	a=4,
 	a1l=L["d/common/un/l"],a1dv="player",a1tt=L["d/common/un/tt"],
-	a2l=L["d/common/power/l"],a2dv="SPELL_POWER_MANA",a2tt=L["d/common/power/tt"],
+	a2l=L["d/common/power/l"],a2dv="Mana",a2tt=L["d/common/power/tt"],
 	a3l=L["d/common/co/l"],a3dv="<",a3tt=L["d/common/co/tt"],
 	a4l=L["d/common/count/l"],a4dv="0",a4tt=L["d/common/count/tt"],
 	f=function () return format('dna.GetUnitPowerMax(%q,%s)%s%s', dna.ui["ebArg1"]:GetText(), dna.ui["ebArg2"]:GetText(), dna.ui["ebArg3"]:GetText(), dna.ui["ebArg4"]:GetText()) end,
@@ -1264,7 +1264,7 @@ end
 dna.D.criteria["d/unit/GetUnitPowerPercent"]={
 	a=4,
 	a1l=L["d/common/un/l"],a1dv="target",a1tt=L["d/common/un/tt"],
-	a2l=L["d/common/power/l"],a2dv="SPELL_POWER_MANA",a2tt=L["d/common/power/tt"],
+	a2l=L["d/common/power/l"],a2dv="Mana",a2tt=L["d/common/power/tt"],
 	a3l=L["d/common/co/l"],a3dv="<",a3tt=L["d/common/co/tt"],
 	a4l=L["d/common/pe/l"],a4dv="75",a4tt=L["d/common/pe/tt"],
 	f=function () return format('dna.GetUnitPowerPercent(%q,%s)%s%s', dna.ui["ebArg1"]:GetText(), dna.ui["ebArg2"]:GetText(), dna.ui["ebArg3"]:GetText(), dna.ui["ebArg4"]:GetText()) end,
@@ -2033,24 +2033,6 @@ dna.D.InitCriteriaClassTree=function()
 			dnaTooltip:Hide()
 			return lSpellFound
 		end
-		dna.D.criteria["d/class/common/GetEnergy"]={
-			a=2,
-			a1l=L["d/common/co/l"],a1dv="<",a1tt=L["d/common/co/tt"],
-			a2l=L["d/common/energy/l"],a2dv="5",a2tt=L["d/common/energy/tt"],
-			f=function () return format('dna.GetUnitPower("player",SPELL_POWER_ENERGY)%s%s', dna.ui["ebArg1"]:GetText(), dna.ui["ebArg2"]:GetText()) end,
-		}
-		dna.D.criteria["d/class/common/GetEnergyTimeToMax"]={
-			a=2,
-			a1l=L["d/common/co/l"],a1dv="<",a1tt=L["d/common/co/tt"],
-			a2l=L["d/common/seconds/l"],a2dv="5",a2tt=L["d/common/seconds/tt"],
-			f=function () return format('dna.D.P["SPELL_POWER_ENERGY"].ttm%s%s', dna.ui["ebArg1"]:GetText(), dna.ui["ebArg2"]:GetText()) end,
-		}
-		dna.D.criteria["d/class/common/GetEnergyRegenRate"]={
-			a=2,
-			a1l=L["d/common/co/l"],a1dv=">=",a1tt=L["d/common/co/tt"],
-			a2l=L["d/common/count/l"],a2dv="15",a2tt=L["d/common/count/tt"],
-			f=function () return format('dna.D.P["SPELL_POWER_ENERGY"].pgr%s%s', dna.ui["ebArg1"]:GetText(), dna.ui["ebArg2"]:GetText()) end,
-		}
 		dna.D.criteria["d/class/common/GetWeaponEnchant"]={--Get weapon enchant
 			a=2,
 			a1l=L["d/common/ws/l"],a1dv="mainhand",a1tt=L["d/common/ws/tt"],
@@ -2074,25 +2056,7 @@ dna.D.InitCriteriaClassTree=function()
 		}
 		tinsert( dna.D.criteriatree[CLASS_CRITERIA].children, { value='dna.CreateCriteriaPanel("d/class/deathknight/GetDeathStrikeHealPercent")', text=L["d/class/deathknight/GetDeathStrikeHealPercent"] } )
 		--------------------------------------------------------------------------------------
-		dna.GetGhoulExists=function()
-			dna.D.ResetDebugTimer()
-			local haveGhoul, name, startTime, duration, icon = GetTotemInfo(1)
-			dna.AppendActionDebug( 'GetGhoulExists()='..tostring(haveGhoul) )
-			return haveGhoul
-		end
-		dna.D.criteria["d/class/deathknight/GetGhoulExists"]={
-			a=0,
-			f=function () return 'dna.GetGhoulExists()' end,
-		}
-		tinsert( dna.D.criteriatree[CLASS_CRITERIA].children, { value='dna.CreateCriteriaPanel("d/class/deathknight/GetGhoulExists")', text=L["d/class/deathknight/GetGhoulExists"] } )
-		--------------------------------------------------------------------------------------
-		dna.D.criteria["d/class/deathknight/GetRunicPower"]={
-			a=2,
-			a1l=L["d/common/co/l"],a1dv="<=",a1tt=L["d/common/co/tt"],
-			a2l=L["d/class/deathknight/rp"],a2dv="76",a2tt=L["d/class/deathknight/rptt"],
-			f=function () return format('dna.GetUnitPower("player",SPELL_POWER_RUNIC_POWER)%s%s', dna.ui["ebArg1"]:GetText(), dna.ui["ebArg2"]:GetText()) end,
-		}
-		tinsert( dna.D.criteriatree[CLASS_CRITERIA].children, { value='dna.CreateCriteriaPanel("d/class/deathknight/GetRunicPower")', text=L["d/class/deathknight/GetRunicPower"] } )
+
 		--------------------------------------------------------------------------------------
 		dna.GetTotalRuneCount=function()
             dna.D.ResetDebugTimer()
@@ -2156,13 +2120,7 @@ dna.D.InitCriteriaClassTree=function()
     -- HUNTER
     ----------------------------------------------------
 	elseif (dna.D.PClass == "HUNTER") then
-		dna.D.criteria["d/class/hunter/GetFocus"]={--Focus
-			a=2,
-			a1l=L["d/common/co/l"],a1dv="<",a1tt=L["d/common/co/tt"],
-			a2l=L["d/common/focus/l"],a2dv="50",a2tt=L["d/common/focus/tt"],
-			f=function () return format('dna.GetUnitPower("player",SPELL_POWER_FOCUS)%s%s', dna.ui["ebArg1"]:GetText(), dna.ui["ebArg2"]:GetText()) end,
-		}
-		tinsert( dna.D.criteriatree[CLASS_CRITERIA].children, { value='dna.CreateCriteriaPanel("d/class/hunter/GetFocus")', text=L["d/class/hunter/GetFocus"] } )
+
 	elseif (dna.D.PClass == "MAGE") then---------------------------------------------------------------------------------
 
 	elseif (dna.D.PClass == "MONK") then---------------------------------------------------------------------------------
@@ -2170,13 +2128,7 @@ dna.D.InitCriteriaClassTree=function()
 		--------------------------------------------------------------------------------------
 		tinsert( dna.D.criteriatree[CLASS_CRITERIA].children, { value='dna.CreateCriteriaPanel("d/class/common/GetEnergyTimeToMax")', text=L["d/class/common/GetEnergyTimeToMax"] } )
 		--------------------------------------------------------------------------------------
-		dna.D.criteria["d/class/monk/GetChi"]={--Chi
-			a=2,
-			a1l=L["d/common/co/l"],a1dv="<",a1tt=L["d/common/co/tt"],
-			a2l=L["d/class/monk/GetChi/l"],a2dv="3",a2tt=L["d/class/monk/GetChi/tt"],
-			f=function () return format('dna.GetUnitPower("player",SPELL_POWER_CHI)%s%s', dna.ui["ebArg1"]:GetText(), dna.ui["ebArg2"]:GetText()) end,
-		}
-		tinsert( dna.D.criteriatree[CLASS_CRITERIA].children, { value='dna.CreateCriteriaPanel("d/class/monk/GetChi")', text=L["d/class/monk/GetChi"] } )
+
 		--------------------------------------------------------------------------------------
 		dna.D.criteria["d/class/monk/GetStaggerPercent"]={
 			a=2,
@@ -2234,21 +2186,9 @@ dna.D.InitCriteriaClassTree=function()
 		}
 		tinsert( dna.D.criteriatree[CLASS_CRITERIA].children, { value='dna.CreateCriteriaPanel("d/class/paladin/GetTimeToGainHolyPower")', text=L["d/class/paladin/GetTimeToGainHolyPower"] } )
 		--------------------------------------------------------------------------------------
-		dna.D.criteria["d/class/paladin/GetHolyPower"]={
-			a=2,
-			a1l=L["d/common/co/l"],a1dv="==",a1tt=L["d/common/co/tt"],
-			a2l=L["d/common/count/l"],a2dv="3",a2tt=L["d/common/count/tt"],
-			f=function () return format('dna.GetUnitPower("player",SPELL_POWER_HOLY_POWER)%s%s', dna.ui["ebArg1"]:GetText(), dna.ui["ebArg2"]:GetText()) end,
-		}
-		tinsert( dna.D.criteriatree[CLASS_CRITERIA].children, { value='dna.CreateCriteriaPanel("d/class/paladin/GetHolyPower")', text=L["d/class/paladin/GetHolyPower"] } )
+
 	elseif (dna.D.PClass == "PRIEST") then---------------------------------------------------------------------------------
-		dna.D.criteria["d/class/priest/GetShadowOrbs"]={--Shadow Orbs
-			a=2,
-			a1l=L["d/common/co/l"],a1dv="==",a1tt=L["d/common/co/tt"],
-			a2l=L["d/common/count/l"],a2dv="3",a2tt=L["d/common/count/tt"],
-			f=function () return format('dna.GetUnitPower("player",SPELL_POWER_SHADOW_ORBS)%s%s', dna.ui["ebArg1"]:GetText(), dna.ui["ebArg2"]:GetText()) end,
-		}
-		tinsert( dna.D.criteriatree[CLASS_CRITERIA].children, { value='dna.CreateCriteriaPanel("d/class/priest/GetShadowOrbs")', text=L["d/class/priest/GetShadowOrbs"] } )
+
 	elseif (dna.D.PClass == "ROGUE") then---------------------------------------------------------------------------------
 		dna.GetComboPoints=function()
 			dna.D.ResetDebugTimer()
@@ -2353,29 +2293,9 @@ dna.D.InitCriteriaClassTree=function()
 		--------------------------------------------------------------------------------------
 		tinsert( dna.D.criteriatree[CLASS_CRITERIA].children, { value='dna.CreateCriteriaPanel("d/class/common/GetWeaponEnchant")', text=L["d/class/common/GetWeaponEnchant"] } )
 	elseif (dna.D.PClass == "WARLOCK") then---------------------------------------------------------------------------------
-		dna.D.criteria["d/class/warlock/GetBurningEmbers"]={
-			a=2,
-			a1l=L["d/common/co/l"],a1dv=">",a1tt=L["d/common/co/tt"],
-			a2l=L["d/class/warlock/burningembers/l"],a2dv='2',a2tt=L["d/class/warlock/burningembers/tt"],
-			f=function () return format('dna.GetUnitPower("player",SPELL_POWER_BURNING_EMBERS)%s%s', dna.ui["ebArg1"]:GetText(), dna.ui["ebArg2"]:GetText()) end,
-		}
-		tinsert( dna.D.criteriatree[CLASS_CRITERIA].children, { value='dna.CreateCriteriaPanel("d/class/warlock/GetBurningEmbers")', text=L["d/class/warlock/GetBurningEmbers"] } )
+
 		--------------------------------------------------------------------------------------
-		dna.D.criteria["d/class/warlock/GetBurningEmbersSegs"]={
-			a=2,
-			a1l=L["d/common/co/l"],a1dv=">",a1tt=L["d/common/co/tt"],
-			a2l=L["d/class/warlock/burningemberss/l"],a2dv='2',a2tt=L["d/class/warlock/burningemberss/tt"],
-			f=function () return format('dna.GetUnitPower("player",SPELL_POWER_BURNING_EMBERS, true)%s%s', dna.ui["ebArg1"]:GetText(), dna.ui["ebArg2"]:GetText()) end,
-		}
-		tinsert( dna.D.criteriatree[CLASS_CRITERIA].children, { value='dna.CreateCriteriaPanel("d/class/warlock/GetBurningEmbersSegs")', text=L["d/class/warlock/GetBurningEmbersSegs"] } )
-		--------------------------------------------------------------------------------------
-		dna.D.criteria["d/class/warlock/GetDemonicFury"]={
-			a=2,
-			a1l=L["d/common/co/l"],a1dv=">",a1tt=L["d/common/co/tt"],
-			a2l=L["d/class/warlock/df/l"],a2dv='2',a2tt=L["d/class/warlock/df/tt"],
-			f=function () return format('dna.GetUnitPower("player",SPELL_POWER_DEMONIC_FURY)%s%s', dna.ui["ebArg1"]:GetText(), dna.ui["ebArg2"]:GetText()) end,
-		}
-		tinsert( dna.D.criteriatree[CLASS_CRITERIA].children, { value='dna.CreateCriteriaPanel("d/class/warlock/GetDemonicFury")', text=L["d/class/warlock/GetDemonicFury"] } )
+
 		--------------------------------------------------------------------------------------
 		dna.GetSecondsInMetamorphosis=function()
 			dna.D.ResetDebugTimer()
@@ -2394,21 +2314,9 @@ dna.D.InitCriteriaClassTree=function()
 		}
 		tinsert( dna.D.criteriatree[CLASS_CRITERIA].children, { value='dna.CreateCriteriaPanel("d/class/warlock/GetSecondsInMetamorphosis")', text=L["d/class/warlock/GetSecondsInMetamorphosis"] } )
 		--------------------------------------------------------------------------------------
-		dna.D.criteria["d/class/warlock/GetSoulShards"]={
-			a=2,
-			a1l=L["d/common/co/l"],a1dv=">",a1tt=L["d/common/co/tt"],
-			a2l=L["d/class/warlock/soulshards/l"],a2dv='2',a2tt=L["d/class/warlock/soulshards/tt"],
-			f=function () return format('dna.GetUnitPower("player",SPELL_POWER_SOUL_SHARDS)%s%s', dna.ui["ebArg1"]:GetText(), dna.ui["ebArg2"]:GetText()) end,
-		}
-		tinsert( dna.D.criteriatree[CLASS_CRITERIA].children, { value='dna.CreateCriteriaPanel("d/class/warlock/GetSoulShards")', text=L["d/class/warlock/GetSoulShards"] } )
+
 	elseif (dna.D.PClass == "WARRIOR") then---------------------------------------------------------------------------------
-		dna.D.criteria["d/class/warrior/GetRage"]={--Rage
-			a=2,
-			a1l=L["d/common/co/l"],a1dv=">",a1tt=L["d/common/co/tt"],
-			a2l=L["d/class/warrior/rage/l"],a2dv="110",a2tt=L["d/class/warrior/rage/tt"],
-			f=function () return format('dna.GetUnitPower("player",SPELL_POWER_RAGE)%s%s', dna.ui["ebArg1"]:GetText(), dna.ui["ebArg2"]:GetText()) end,
-		}
-		tinsert( dna.D.criteriatree[CLASS_CRITERIA].children, { value='dna.CreateCriteriaPanel("d/class/warrior/GetRage")', text=L["d/class/warrior/GetRage"] } )
+
 	end
 end
 

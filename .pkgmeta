@@ -1,8 +1,7 @@
 package-as: dna
 enable-nolib-creation: no
 
-externals:
-
 ignore:
     - README.md
-    - CHANGELOG.md
+
+manual-changelog: CHANGELOG.txt

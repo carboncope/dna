@@ -104,6 +104,10 @@ function dna:UNIT_SPELLCAST_START(event, casterUnit, castGUID, spellID)
 		dna.SetSpellInfo( spellId, 'lastcastedtime', GetTime())
 		dna:doprint(GetTime().." UNIT_SPELLCAST_START:Player spellid["..tostring(spellId).."] spellname["..tostring(name)..']')
 	end
+	if ( spellId and casterUnit == "pet" ) then
+		dna.SetSpellInfo( spellId, 'lastcastedtime', GetTime())
+		dna:doprint(GetTime().." UNIT_SPELLCAST_START:Pet spellid["..tostring(spellId).."] spellname["..tostring(name)..']')
+	end
     if ( spellId and casterUnit ~= "player" and not UnitIsFriend(casterUnit, "player" ) ) then
         if ( dna.GetUnitCastingInterruptibleSpell(casterUnit) ) then
             dna.AddListEntry( 'NPC_INTERRUPTABLE', false, spellId, 's' )
@@ -121,6 +125,10 @@ function dna:UNIT_SPELLCAST_CHANNEL_START(event, casterUnit, castGUID, spellID)
         end
 		dna.SetSpellInfo( spellId, 'lastcastedtime', GetTime())
 		dna:doprint(GetTime().." UNIT_SPELLCAST_CHANNEL_START:Player "..tostring(numSpellId).." "..tostring(dna.GetSpellName(numSpellId)))
+	end
+	if ( spellId and casterUnit == "pet" ) then
+		dna.SetSpellInfo( spellId, 'lastcastedtime', GetTime())
+		dna:doprint(GetTime().." UNIT_SPELLCAST_CHANNEL_START:Pet spellid["..tostring(spellId).."] spellname["..tostring(name)..']')
 	end
     if ( spellId and casterUnit ~= "player" and not UnitIsFriend(casterUnit, "player" ) ) then
         if ( dna.GetUnitCastingInterruptibleSpell(casterUnit) ) then
@@ -140,8 +148,13 @@ function dna:UNIT_SPELLCAST_SUCCEEDED(event, casterUnit, castGUID, spellID)
                 dna.D.lastcastedspellid = spellId
             end
 			dna.SetSpellInfo( spellId, 'lastcastedtime', GetTime())
-			--FIXME re-enable this when done debuggin 6.0 dna:doprint(GetTime().." UNIT_SPELLCAST_SUCCEEDED:Player "..tostring(dna.D.lastcastedspellid).." "..tostring(dna.GetSpellName(numSpellId)))
             dna:doprint(GetTime().." UNIT_SPELLCAST_SUCCEEDED:Player spellid["..tostring(spellId).."] spellname["..tostring(name)..']')
+		end
+	end
+	if ( spellId and casterUnit == "pet" ) then
+		if ( dna.GetSpellCastTime(spellId) == 0 ) then
+			dna.SetSpellInfo( spellId, 'lastcastedtime', GetTime())
+			dna:doprint(GetTime().." UNIT_SPELLCAST_SUCCEEDED:Pet spellid["..tostring(spellId).."] spellname["..tostring(name)..']')
 		end
 	end
     if ( spellId and casterUnit ~= "player" and not UnitIsFriend(casterUnit, "player" ) ) then
