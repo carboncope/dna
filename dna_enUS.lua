@@ -3,13 +3,15 @@ if not L then return end
 --*****************************************************
 --GUI Localization
 --*****************************************************
-L["common/dna"]				= "dna"
-L["common/LDB/tt1"] 			= "<Right Click> to open dna"
-L["common/LDB/tt2"] 			= "<Left Click> to select a Rotation"
-L["common/versionprefix"]		= "v"
+L["common/dna"] = "dna"
+L["common/LDB/tt1"] = "<Right Click> to open dna"
+L["common/LDB/tt2"] = "<Left Click> to select a Rotation"
+L["common/LDB/tt3"] = "<Shift + Left Click> to reload ui"
+L["common/LDB/tt4"] = "<Shift + Right Click> to open DNA debug"
+L["common/versionprefix"] = "v"
 
-L["utils/debug/prefix"] 		= "|cffF95C25dna|r:"
-L["utils/debug/mlebDebug/l"] 	= "Debug Output:"
+L["utils/debug/prefix"] = "|cffF95C25dna|r:"
+L["utils/debug/mlebDebug/l"] = "Debug Output:"
 L["utils/debug/lua/l"]		 	= "Lua compiler:"
 
 L["maintree/options"] 	= "Options"
@@ -78,6 +80,8 @@ L["list/bListDelete/tt"]						= "Delete this list\n|cffFF0000WARNING|r: No undo 
 L["list/ilLMoveUp/tt"]							= "Move list up"
 L["list/ilLMoveDown/tt"]						= "Move list down"
 L["list/bEntryDelete/tt"]						= "Delete the selected spell from the list\n|cffFF0000WARNING|r: No undo or prompt"
+L["list/ddAddToList/l"] = "Add to list:"
+L["list/ddAddToList/tt"] = "Select a list to add this spell to"
 
 --*****************************************************
 --Rotations Panel
@@ -260,10 +264,31 @@ L["d/common/list/tt"]							= "Enter the list name |cffF95C25Interrupts|r"
 L["d/common/number/l"]							= "Number:"
 L["d/common/number/dv"]							= "10"
 L["d/common/number/tt"]							= "Enter a number |cffF95C2510|r"
-L["d/common/pe/l"]								= "Percentage:"
-L["d/common/pe/tt"]								= "Enter percent without % sign Example:|cffF95C2575|r"
-L["d/common/power/l"]							= "Power Type:"
-L["d/common/power/tt"]							= "Enter powertype:|cffF95C25\nSPELL_POWER_MANA\nSPELL_POWER_RAGE\nSPELL_POWER_FOCUS\nSPELL_POWER_ENERGY\nSPELL_POWER_RUNES\nSPELL_POWER_RUNIC_POWER\nSPELL_POWER_SOUL_SHARDS\nSPELL_POWER_ASTRAL\nSPELL_POWER_HOLY_POWER\nSPELL_POWER_CHI\nSPELL_POWER_SHADOW_ORBS\nSPELL_POWER_BURNING_EMBERS\nSPELL_POWER_DEMONIC_FURY|r"
+L["d/common/pe/l"]									= "Percentage:"
+L["d/common/pe/tt"]									= "Enter percent without % sign Example:|cffF95C2575|r"
+L["d/common/power/l"]								= "Power Type:"
+L["d/common/power/tt"]							= "Enter powertype (case sensitive):"..
+																"|cffF95C25\nHealthCost\n"..
+																"|cffF95C25\nNone\n"..
+																"|cffF95C25\nMana\n"..
+																"|cffF95C25\nRage\n"..
+																"|cffF95C25\nFocus\n"..
+																"|cffF95C25\nEnergy\n"..
+																"|cffF95C25\nComboPoints\n"..
+																"|cffF95C25\nRunes\n"..
+																"|cffF95C25\nRunicPower\n"..
+																"|cffF95C25\nSoulShards\n"..
+																"|cffF95C25\nLunarPower\n"..
+																"|cffF95C25\nHolyPower\n"..
+																"|cffF95C25\nAlternate\n"..
+																"|cffF95C25\nChi\n"..
+																"|cffF95C25\nInsanity\n"..
+																"|cffF95C25\nObsolete\n"..
+																"|cffF95C25\nObsolete2\n"..
+																"|cffF95C25\nArcaneCharges\n"..
+																"|cffF95C25\nFury\n"..
+																"|cffF95C25\nPain\n"..
+																"|cffF95C25\nNumPowerTypesr"
 L["d/common/ppm/l"]								= "PPM:"
 L["d/common/ppm/tt"]							= "Enter the procs per minute |cffF95C252.6|r"
 L["d/common/seconds/l"]							= "Seconds:"
@@ -443,8 +468,6 @@ L["d/class"]									= "Class"
 
 	--HUNTER-------------------------------------------
 	L["d/class/hunter/GetFocus"]				= "Focus is |cffF95C25<operator>|r |cffF95C25<number>|r"
-	L["d/class/hunter/GetFocusDeficit"]			= "Focus deficit is |cffF95C25<operator>|r |cffF95C25<number>|r"
-	
 	--MAGE---------------------------------------------
 	--MONK---------------------------------------------
 	L["d/class/monk/GetChi"]					= "Chi is |cffF95C25<operator>|r |cffF95C25<number>|r"

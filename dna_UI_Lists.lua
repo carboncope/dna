@@ -29,7 +29,7 @@ function dna.AddList( ListName, ForceRename, ShowError )
         entries={},
     }
 	if ( dna:SearchTable(dna.D.LTMC, "text", lNewListText) ) then
-		if ( dna.ui.sgMain ) then dna.ui.fMain:SetStatusText( string.format(L["common/error/exists"], lNewListText) ) end
+		if ( dna.ui.sgMain and ShowError == true ) then dna.ui.fMain:SetStatusText( string.format(L["common/error/exists"], lNewListText) ) end
 	else
 		table.insert( dna.D.LTMC, tNewList)
 		if ( dna.ui.sgMain ) then
@@ -57,10 +57,10 @@ function dna.AddListEntry( ListName, ShowError, ID, Type )
 	elseif ( Type == 'i' ) then
 		strNewEntryText = dna.GetItemName(ID)
 	end
-	local tNewEntry = { value = lNewEntryValue, text = strNewEntryText}
+	local tNewEntry = { value = lNewEntryValue, text = strNewEntryText, entryType = Type}
     
     -- Check if entry exists
-    local bDuplicateEntry = dna.D.LTMC[nListKey].entries[strNewEntryText]
+    local bDuplicateEntry = dna.D.LTMC[nListKey].entries[strNewEntryText]	
 	if ( bDuplicateEntry ) then
 		if ( dna.ui.sgMain and ShowError ) then dna.ui.fMain:SetStatusText( string.format(L["common/error/exists"], strNewEntryText) ) end
 	else
@@ -128,6 +128,7 @@ function dna.CreateListPanel(ListName)
 	--dna.ui.sgMain.tgMain.sgPanel.tgList:SetHeight( 50 )
 	dna.ui.sgMain.tgMain.sgPanel.tgList:SetTreeWidth( 350, true )
 	dna.ui.sgMain.tgMain.sgPanel.tgList:SetFullWidth(true)
+	--dna.ui.sgMain.tgMain.sgPanel.tgList:SetHeight(400)
 
 	dna.ui.sgMain.tgMain.sgPanel.tgList:SetCallback( "OnGroupSelected", dna.ui.tgListOnGroupSelected )
 	dna.ui.sgMain.tgMain.sgPanel.tgList:EnableButtonTooltips( false )
@@ -148,7 +149,8 @@ function dna.CreateListPanel(ListName)
 	dna.ui.sgMain.tgMain.sgPanel.tgList:AddChild(dna.ui.sgMain.tgMain.sgPanel.tgList.sgEntryPanel)
 	dna.ui.sgMain.tgMain.sgPanel.tgList.sgEntryPanel:SetLayout("List")
 	-- dna.ui.sgMain.tgMain.sgPanel.tgList.sgEntryPanel:SetFullWidth(true)
-    dna.ui.sgMain.tgMain.sgPanel.tgList.sgEntryPanel:SetWidth(100)
+    dna.ui.sgMain.tgMain.sgPanel.tgList.sgEntryPanel:SetWidth(130)
+	dna.ui.sgMain.tgMain.sgPanel.tgList.sgEntryPanel:SetHeight(60)
 
 
 
@@ -221,7 +223,6 @@ function dna.CreateListPanel(ListName)
 	ilItemLink:SetCallback( "OnEnter", function(self) dna.ui.ShowTooltip(self.frame, self.Tooltip, "LEFT", "RIGHT", 0, 0, "link") end )
 	ilItemLink:SetCallback( "OnLeave", function() dna.ui.HideTooltip() end )
 
-
 	-- Rename List edit box
 	local ebRenameList = dna.lib_acegui:Create("EditBox")
 	dna.ui.sgMain.tgMain.sgPanel:AddChild( ebRenameList )
@@ -233,8 +234,6 @@ function dna.CreateListPanel(ListName)
 	ebRenameList:SetCallback( "OnLeave", function() dna.ui.HideTooltip() end )
 	ebRenameList:SetText( dna.ui.DB.text )
 
-
-
 	-- Copy List edit box
 	local ebCopyList = dna.lib_acegui:Create("EditBox")
 	dna.ui.sgMain.tgMain.sgPanel:AddChild( ebCopyList )
@@ -244,7 +243,6 @@ function dna.CreateListPanel(ListName)
 	ebCopyList:SetCallback( "OnEnterPressed", dna.ui.ebCopyListOnEnterPressed )
 	ebCopyList:SetCallback( "OnEnter", function(self) dna.ui.ShowTooltip(self.frame, L["list/ebCopyList/tt"], "BOTTOMRIGHT", "TOPRIGHT", 0, -10, "text") end )
 	ebCopyList:SetCallback( "OnLeave", function() dna.ui.HideTooltip() end )
-
 
 	-- Move up interactive label
 	local ilLMoveUp = dna.lib_acegui:Create("InteractiveLabel")
@@ -280,8 +278,6 @@ function dna.CreateListPanel(ListName)
 	bListDelete:SetCallback( "OnEnter", function(self) dna.ui.ShowTooltip(self.frame, L["list/bListDelete/tt"], "LEFT", "RIGHT", 0, 0, "text") end )
 	bListDelete:SetCallback( "OnLeave", function() dna.ui.HideTooltip() end )
 
-
-
 end
 --List Panel Callbacks-----------------------------
 function dna.ui.tgListOnGroupSelected(self)
@@ -314,14 +310,45 @@ function dna.ui.CreateListEntryPanel()
 	-- Delete List Entry button
 	local bEntryDelete = dna.lib_acegui:Create("Button")
 	dna.ui.sgMain.tgMain.sgPanel.tgList.sgEntryPanel:AddChild( bEntryDelete )
-    -- bEntryDelete:SetFullWidth(true)
-    bEntryDelete:SetWidth(100)
+    bEntryDelete:SetWidth(130)
 	bEntryDelete:SetText( L["common/delete"] )
 	bEntryDelete:SetPoint("BOTTOMRIGHT", dna.ui.sgMain.tgMain.sgPanel.tgList.sgEntryPanel.frame, "BOTTOMRIGHT", 0, 0);
 	bEntryDelete:SetCallback( "OnClick", function() dna.ui.bEntryDeleteOnClick() end )
 	bEntryDelete:SetCallback( "OnEnter", function(self) dna.ui.ShowTooltip(self.frame, L["list/bEntryDelete/tt"], "LEFT", "RIGHT", 0, 0, "text") end )
 	bEntryDelete:SetCallback( "OnLeave", function() dna.ui.HideTooltip() end )
+	
+	-- Add to list Dropdown
+	local ddAddToList = dna.lib_acegui:Create("Dropdown")
+	dna.ui.sgMain.tgMain.sgPanel.tgList.sgEntryPanel:AddChild( ddAddToList )
+	ddAddToList:SetList( dna.ui.GetListNames() )
+	ddAddToList:SetLabel( L["list/ddAddToList/l"] )
+	ddAddToList:SetWidth(132)
+	ddAddToList:SetPoint("TOPLEFT", bEntryDelete.frame, "BOTTOMLEFT", 0, 0)
+	ddAddToList:SetCallback( "OnValueChanged", function(self)
+		local targetListName = dna.ui.GetListNames()[self:GetValue()]
+		if (not dna.IsBlank(targetListName) and not dna.IsBlank(dna.ui.SelectedListEntryKey)) then
+			local strText = dna.D.LTMC[dna.ui.STL[2]].treeList[dna.ui.SelectedListEntryKey].text
+			local entryType = dna.D.LTMC[dna.ui.STL[2]].treeList[dna.ui.SelectedListEntryKey].entryType
+			dna.AddListEntry(targetListName, true, strText, entryType )
+		end
+	end )
+	ddAddToList:SetCallback( "OnEnter", function(self)
+		dna.ui.ShowTooltip(self.frame, L["list/ddAddToList/tt"], "BOTTOMRIGHT", "TOPRIGHT", 0, 0, "text")
+	end )
+	ddAddToList:SetCallback( "OnLeave", function()
+		dna.ui.HideTooltip()
+	end )
 end
+
+
+function dna.ui.GetListNames()
+	local listNames = {}
+	for k, v in pairs(dna.D.LTMC) do
+		listNames[k] = v.text
+	end
+	return listNames
+end
+
 function dna.fGetListExport()
 	local tExport = {}
 	tExport.strType = "list"
@@ -333,17 +360,15 @@ function dna.fGetListExport()
 	strExport = dna.Serialize(tExport)
 	return strExport
 end
-function dna.ui.bEntryDeleteOnClick()
+
+function dna.ui.bEntryDeleteOnClick() -- 12/28/2020
 	if ( dna.IsBlank(dna.ui.SelectedListEntryKey) ) then return end
+	local strSelectedList = dna.D.LTMC[dna.ui.STL[2]].value
+	local entryText = dna.D.LTMC[dna.ui.STL[2]].treeList[dna.ui.SelectedListEntryKey].text
 
-	local strSelectedList	= dna.D.LTMC[dna.ui.STL[2]].value
-    local strText	        = dna.D.LTMC[dna.ui.STL[2]].text
--- print("dna.ui.SelectedListEntryKey="..tostring(dna.ui.SelectedListEntryKey))
--- print("strText="..tostring(strText))
 	tremove(dna.D.LTMC[dna.ui.STL[2]].treeList, dna.ui.SelectedListEntryKey)
-    dna.D.LTMC[dna.ui.STL[2]].entries[strText] = nil
-	dna.ui.sgMain.tgMain:SelectByValue(dna.D.LTM.value.."\001"..strSelectedList)
-
+    dna.D.LTMC[dna.ui.STL[2]].entries[entryText] = nil
+	dna.ui.sgMain.tgMain:SelectByValue(dna.D.LTM.value.."\001"..strSelectedList) -- Click back on main list: Require the user to click another spell and update dna.ui.SelectedListEntryKey
 end
 function dna.ui.ebRenameListOnEnterPressed(...)
 	local lListName = select(3, ...)

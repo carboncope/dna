@@ -106,84 +106,7 @@ function dna:OnEnable()
     nListKey = select(2, dna.AddList("NPC_OTHER", false, false))
     tremove(dna.D.LTMC, nListKey)
 
-	dna.D.knownGUIDTypes = {[0]="player", [1]="world object", [3]="NPC", [4]="pet", [5]="vehicle"}		--GUID types
-	dna.D.AuraTypes = { ["BUFF"] = 1, ["DEBUFF"] = 2, }
-
-	-- dna.D.TU={}																						--Tracked unit data for battleground targets, playername is the key
-	-- dna.D.TU.AddPlayer=function(playername)
-		-- if ( not dna.D.TU[playername] ) then
-			-- dna.D.TU[playername] = {}
-			-- dna.D.TU[playername].auras = {}
-			-- dna.D.TU[playername].lut = GetTime()--unit last update time
-		-- end
-	-- end
-	-- dna.D.TU.ApplyAura=function(playername, spell, sourceguid)
-		-- if ( not dna.D.TU[playername] ) then return end
-		-- if ( not dna.D.TU[playername].auras[spell] ) then
-			-- dna.D.TU[playername].auras[spell] = {}
-			-- dna.D.TU[playername].auras[spell].sguid = sourceguid
-		-- end
-		-- dna.D.TU[playername].auras[spell].lat = GetTime()--last applied time
-		-- dna.D.TU[playername].auras[spell].lut = GetTime()--aura last update time
-		-- dna.D.TU[playername].lut = GetTime()--unit last update time
-	-- end
-	-- dna.D.TU.RemoveAura=function(playername, spell)
-		-- if ( not dna.D.TU[playername] ) then return end
-		-- if ( dna.D.TU[playername].auras[spell] ) then
-			-- dna.D.TU[playername].auras[spell] = nil
-			-- table.remove( dna.D.TU[playername].auras, spell )
-		-- end
-		-- dna.D.TU[playername].lut = GetTime()--unit last update time
-	-- end
-	dna.D.POWER_TYPES = {
-		[0]	= "SPELL_POWER_MANA",
-		"SPELL_POWER_RAGE",
-		"SPELL_POWER_FOCUS",
-		"SPELL_POWER_ENERGY",
-		"SPELL_POWER_HAPPINESS",
-		"SPELL_POWER_RUNES",
-		"SPELL_POWER_RUNIC_POWER",
-		"SPELL_POWER_SOUL_SHARDS",
-		"SPELL_POWER_ASTRAL",           --8
-		"SPELL_POWER_HOLY_POWER",
-		"SPELL_POWER_ALTERNATE",
-		"SPELL_POWER_DARK_FORCE",
-		"SPELL_POWER_CHI",
-		"SPELL_POWER_SHADOW_ORBS",
-		"SPELL_POWER_BURNING_EMBERS",
-		"SPELL_POWER_DEMONIC_FURY",
-	}
-       
-	dna.D.P={
-		--Custom player tracked data for use in criteria
-		--pdp=previous data point, used to calculate power gain rate in dna_events.lua
-		--pgr=power gain rate
-		--ttm=time to max power
-		--lut=last update time
-		["SPELL_POWER_MANA"]			={ pdp=0, pgr=0, lut=0, ttm=0, },		--0
-		["SPELL_POWER_RAGE"]			={ pdp=0, pgr=0, lut=0, ttm=0, },		--1
-		["SPELL_POWER_FOCUS"]			={ pdp=0, pgr=0, lut=0, ttm=0, },		--2
-		["SPELL_POWER_ENERGY"]			={ pdp=0, pgr=0, lut=0, ttm=0, },		--3
-		["SPELL_POWER_HAPPINESS"]		={ pdp=0, pgr=0, lut=0, ttm=0, },		--4
-		["SPELL_POWER_RUNES"]			={ pdp=0, pgr=0, lut=0, ttm=0, },		--5
-		["SPELL_POWER_RUNIC_POWER"]		={ pdp=0, pgr=0, lut=0, ttm=0, },		--6
-		["SPELL_POWER_SOUL_SHARDS"]		={ pdp=0, pgr=0, lut=0, ttm=0, },		--7
-		["SPELL_POWER_ECLIPSE"]			={ pdp=0, pgr=0, lut=0, ttm=0, },		--8
-		["SPELL_POWER_HOLY_POWER"]		={ pdp=0, pgr=0, lut=0, ttm=0, },		--9
-		["SPELL_POWER_ALTERNATE"]		={ pdp=0, pgr=0, lut=0, ttm=0, },		--10 I saw this one while questing
-		["SPELL_POWER_ALTERNATE_POWER"]	={ pdp=0, pgr=0, lut=0, ttm=0, },		--10 Not sure if this one is really used
-		["SPELL_POWER_DARK_FORCE"]		={ pdp=0, pgr=0, lut=0, ttm=0, },		--11
-		["SPELL_POWER_CHI"]				={ pdp=0, pgr=0, lut=0, ttm=0, },		--12
-		["SPELL_POWER_SHADOW_ORBS"]		={ pdp=0, pgr=0, lut=0, ttm=0, },		--13
-		["SPELL_POWER_BURNING_EMBERS"]	={ pdp=0, pgr=0, lut=0, ttm=0, },		--14
-		["SPELL_POWER_DEMONIC_FURY"]	={ pdp=0, pgr=0, lut=0, ttm=0, },		--15
-		-- ["ECLIPSE"]						={ eclipse_change = 0, eclipse_next_zero_timestamp = 0 }, --Druid eclipse_change is time until we hit 0 eclipse energy
-		["STAGGER"]						={ percent=0, total=0 },		 		--Monk stagger amounts
-		["METAMORPHOSIS"]				={ appliedtimestamp=0 },		 		--Warlock Metamorphosis tracking in dna_Events
-		["LCT"]							={},							 		--Last casted times for player casted spells
-		["TS"]							={},							 		--Tracked spells table for dot and hot ticks
-		-- ["TU"]							={},							 		--Tracked units table for mob counts
-	}
+	dna.D.P={}		--Custom player tracked data for use in criteria
 
 	dna.D.ResetDebugTimer=function()
 		dna.D.DebugTimerStart = debugprofilestop()
@@ -453,6 +376,8 @@ function dna:OnEnable()
 				tooltip:AddLine(L["common/dna"])
 				tooltip:AddLine(L["common/LDB/tt1"])
 				tooltip:AddLine(L["common/LDB/tt2"])
+				tooltip:AddLine(L["common/LDB/tt3"])
+				tooltip:AddLine(L["common/LDB/tt4"])
 			end,
 		})
 	end

@@ -42,6 +42,10 @@ end
 
 function dna.ui.MenuOnClick(self, button)
 	if button == "LeftButton" then
+		if (IsShiftKeyDown()) then
+			ReloadUI()
+			return
+		end
 		GameTooltip:Hide()
 		if (not dna.ui.MenuFrame) then
 			dna.ui.MenuFrame = CreateFrame("Frame", "dnaMenuFrame", UIParent, "UIDropDownMenuTemplate")
@@ -50,6 +54,10 @@ function dna.ui.MenuOnClick(self, button)
 		UIDropDownMenu_Initialize(dna.ui.MenuFrame, dna.ui.InitMenu, "MENU")
 		ToggleDropDownMenu(1, nil, dna.ui.MenuFrame, self, 20, 4)
 	elseif button == "RightButton" then
+		if (IsShiftKeyDown()) then
+			dna:CreateDebugFrame()
+			return
+		end
 		dna.ui.CreateMainFrame()
 	end
 end

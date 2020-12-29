@@ -38,7 +38,7 @@ function dna:fEngineOnTimer()
 				if bNoErrors and dna.bAPIResult == true and bFoundHighestPriority == false then
 					tAction["_nemo_criteria_passed"] = true -- set _nemo_criteria_passed property to true so dna.GetActionCriteriaState works 
 					-- In order for weak auras to work, you have to add this to first step of a action criteria
-					-- Example: dna:SetActionValue(select(1,...),"_spellid",116670)
+					-- Example: dna:SetWeakAuraInfo(select(1,...),"e","Brain Freeze")
 					if (tAction["_spellid"]) then
 						highestSpell = tAction["_spellid"]
 					end

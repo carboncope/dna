@@ -87,63 +87,68 @@ function dna:UNIT_AURA(_,strUnitID)
 	end
 end
 
-function dna:UNIT_SPELLCAST_START(_,strUnitID,_,_,_,numSpellId)
-	if ( numSpellId and strUnitID == "player" ) then
-        if numSpellId ~= 6603 then
-            dna.D.lastcastedspellid = numSpellId
+function dna:UNIT_SPELLCAST_START(event, casterUnit, castGUID, spellID)
+	name, rank, icon, castTime, minRange, maxRange, spellId = GetSpellInfo(spellID)
+	if ( spellId and casterUnit == "player" ) then
+        if spellId ~= 6603 then
+            dna.D.lastcastedspellid = spellId
         end
-		if numSpellId == dna.nLastSpellCastStartId then
+		if spellId == dna.nLastSpellCastStartId then
 			dna.nRunningSpellCastStartCount = (dna.nRunningSpellCastStartCount or 0) + 1
 			dna:doprint("dna.nRunningSpellCastStartCount="..dna.nRunningSpellCastStartCount)
-		elseif lSpellID ~= dna.D.lastcastedspellid then
+		elseif spellId ~= dna.D.lastcastedspellid then
 			dna.nRunningSpellCastStartCount = 1
 			dna:doprint("dna.nRunningSpellCastStartCount="..dna.nRunningSpellCastStartCount)
 		end
-		dna.nLastSpellCastStartId = numSpellId
-		dna.SetSpellInfo( numSpellId, 'lastcastedtime', GetTime())
-		dna:doprint(GetTime().." UNIT_SPELLCAST_START:Player "..tostring(numSpellId).." "..tostring(dna.GetSpellName(numSpellId)))
+		dna.nLastSpellCastStartId = spellId
+		dna.SetSpellInfo( spellId, 'lastcastedtime', GetTime())
+		dna:doprint(GetTime().." UNIT_SPELLCAST_START:Player spellid["..tostring(spellId).."] spellname["..tostring(name)..']')
 	end
-    if ( numSpellId and strUnitID ~= "player" and not UnitIsFriend(strUnitID, "player" ) ) then
-        if ( dna.GetUnitCastingInterruptibleSpell(strUnitID) ) then
-            dna.AddListEntry( 'NPC_INTERRUPTABLE', false, numSpellId, 's' )
+    if ( spellId and casterUnit ~= "player" and not UnitIsFriend(casterUnit, "player" ) ) then
+        if ( dna.GetUnitCastingInterruptibleSpell(casterUnit) ) then
+            dna.AddListEntry( 'NPC_INTERRUPTABLE', false, spellId, 's' )
         else
-            dna.AddListEntry( 'NPC_OTHER', false, numSpellId, 's' )
+            dna.AddListEntry( 'NPC_OTHER', false, spellId, 's' )
         end
     end
 end
 
-function dna:UNIT_SPELLCAST_CHANNEL_START(_,strUnitID,_,_,_,numSpellId)
-	if ( numSpellId and strUnitID == "player" ) then
-        if numSpellId ~= 6603 then
-            dna.D.lastcastedspellid = numSpellId
+function dna:UNIT_SPELLCAST_CHANNEL_START(event, casterUnit, castGUID, spellID)
+	name, rank, icon, castTime, minRange, maxRange, spellId = GetSpellInfo(spellID)
+	if ( spellId and casterUnit == "player" ) then
+        if spellId ~= 6603 then
+            dna.D.lastcastedspellid = spellId
         end
-		dna.SetSpellInfo( numSpellId, 'lastcastedtime', GetTime())
+		dna.SetSpellInfo( spellId, 'lastcastedtime', GetTime())
 		dna:doprint(GetTime().." UNIT_SPELLCAST_CHANNEL_START:Player "..tostring(numSpellId).." "..tostring(dna.GetSpellName(numSpellId)))
 	end
-    if ( numSpellId and strUnitID ~= "player" and not UnitIsFriend(strUnitID, "player" ) ) then
-        if ( dna.GetUnitCastingInterruptibleSpell(strUnitID) ) then
-            dna.AddListEntry( 'NPC_INTERRUPTABLE', false, numSpellId, 's' )
+    if ( spellId and casterUnit ~= "player" and not UnitIsFriend(casterUnit, "player" ) ) then
+        if ( dna.GetUnitCastingInterruptibleSpell(casterUnit) ) then
+            dna.AddListEntry( 'NPC_INTERRUPTABLE', false, spellId, 's' )
         else
-           dna.AddListEntry( 'NPC_OTHER', false, numSpellId, 's' )
+           dna.AddListEntry( 'NPC_OTHER', false, spellId, 's' )
         end
     end
 end
-function dna:UNIT_SPELLCAST_SUCCEEDED(_,strUnitID,_,_,_,numSpellId)
-	if ( numSpellId and strUnitID == "player" ) then
-		if ( dna.GetSpellCastTime(numSpellId) == 0 ) then				-- Only update last casted time for instant or channeled spells
-            if numSpellId ~= 6603 then
-                dna.D.lastcastedspellid = numSpellId
+function dna:UNIT_SPELLCAST_SUCCEEDED(event, casterUnit, castGUID, spellID)
+	--https://wow.gamepedia.com/UNIT_SPELLCAST_SUCCEEDED
+	--https://wow.gamepedia.com/API_GetSpellInfo
+	name, rank, icon, castTime, minRange, maxRange, spellId = GetSpellInfo(spellID)
+	if ( spellId and casterUnit == "player" ) then
+		if ( dna.GetSpellCastTime(spellId) == 0 ) then				-- Only update last casted time for instant or channeled spells
+            if spellId ~= 6603 then
+                dna.D.lastcastedspellid = spellId
             end
-			dna.SetSpellInfo( numSpellId, 'lastcastedtime', GetTime())
+			dna.SetSpellInfo( spellId, 'lastcastedtime', GetTime())
 			--FIXME re-enable this when done debuggin 6.0 dna:doprint(GetTime().." UNIT_SPELLCAST_SUCCEEDED:Player "..tostring(dna.D.lastcastedspellid).." "..tostring(dna.GetSpellName(numSpellId)))
-            dna:doprint(GetTime().." UNIT_SPELLCAST_SUCCEEDED:Player "..tostring(numSpellId).." "..tostring(dna.GetSpellName(numSpellId)))
+            dna:doprint(GetTime().." UNIT_SPELLCAST_SUCCEEDED:Player spellid["..tostring(spellId).."] spellname["..tostring(name)..']')
 		end
 	end
-    if ( numSpellId and strUnitID ~= "player" and not UnitIsFriend(strUnitID, "player" ) ) then
-        if ( dna.GetUnitCastingInterruptibleSpell(strUnitID) ) then
-            dna.AddListEntry( 'NPC_INTERRUPTABLE', false, numSpellId, 's' )
+    if ( spellId and casterUnit ~= "player" and not UnitIsFriend(casterUnit, "player" ) ) then
+        if ( dna.GetUnitCastingInterruptibleSpell(casterUnit) ) then
+            dna.AddListEntry( 'NPC_INTERRUPTABLE', false, spellId, 's' )
         else
-           dna.AddListEntry( 'NPC_OTHER', false, numSpellId, 's' )
+           dna.AddListEntry( 'NPC_OTHER', false, spellId, 's' )
         end
     end
 end

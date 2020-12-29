@@ -987,42 +987,6 @@ dna.D.criteria["d/unit/GetUnitHasMyDebuffNameTimeleft"]={
 tinsert( dna.D.criteriatree[UNIT_CRITERIA].children, { value='dna.CreateCriteriaPanel("d/unit/GetUnitHasMyDebuffNameTimeleft")', text=L["d/unit/GetUnitHasMyDebuffNameTimeleft"] } )
 ----------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------
-dna.GetUnitHasMySpellTicksRemaining=function(unit, spell, baseticktime)
-	dna.D.ResetDebugTimer()
-	local lspellID	= dna.GetSpellID(spell)
-	local lunitGUID = nil
-	local lReturn	= 0
-	if ( unit and UnitExists(unit) ) then
-		lunitGUID = UnitGUID(unit)
-	end
-	if ( not baseticktime ) then
-		if ( dna.D.SpellInfo[spell] and dna.D.SpellInfo[spell].baseticktime ) then
-			baseticktime = dna.D.SpellInfo[spell].baseticktime
-		else
-			baseticktime = 2
-		end
-	end
-	if ( lspellID and lunitGUID and dna.D.P.TS[lspellID..':'..lunitGUID] ) then
- 		local lHastedTickTime = dna.GetSpellTickTimeOnUnit(lspellID, baseticktime, unit)
-		if ( dna.D.P.TS[lspellID..':'..lunitGUID].atype == dna.D.AuraTypes["DEBUFF"] ) then
-			lReturn = math.ceil( dna.GetUnitHasDebuffNameTimeleft(unit,lspellID,"PLAYER") / (lHastedTickTime or 2) )
-		elseif ( dna.D.P.TS[lspellID..':'..lunitGUID].atype == dna.D.AuraTypes["BUFF"] ) then
-			lReturn = math.ceil( dna.GetUnitHasBuffNameTimeleft(unit,lspellID,"PLAYER") / (lHastedTickTime or 2) )
-		end
-	end
-	dna.AppendActionDebug( 'GetUnitHasMySpellTicksRemaining(unit='..tostring(unit)..",spell="..tostring(spell)..",baseticktime="..tostring(baseticktime)..')='..tostring(lReturn) )
-	return lReturn
-end
-dna.D.criteria["d/unit/GetUnitHasMySpellTicksRemaining"]={
-	a=3,
-	a1l=L["d/common/un/l"],a1dv="target",a1tt=L["d/common/un/tt"],
-	a2l=L["d/common/sp/l"],a2dv=L["d/common/sp/dv"],a2tt=L["d/common/sp/tt"],
-	a3l=L["d/common/ticktime/l"],a3dv="2",a3tt=L["d/common/ticktime/tt"],
-	f=function () return format('dna.GetUnitHasMySpellTicksRemaining(%q,%q,%s)', dna.ui["ebArg1"]:GetText(), dna.ui["ebArg2"]:GetText(), dna.ui["ebArg3"]:GetText() ) end,
-}
-tinsert( dna.D.criteriatree[UNIT_CRITERIA].children, { value='dna.CreateCriteriaPanel("d/unit/GetUnitHasMySpellTicksRemaining")', text=L["d/unit/GetUnitHasMySpellTicksRemaining"] } )
-----------------------------------------------------------------------------------------------
-----------------------------------------------------------------------------------------------
 dna.GetUnitHealth=function(unit)
 	dna.D.ResetDebugTimer()
 	local lReturn = dna.NilToNumeric( UnitHealth(unit) ) or -1
@@ -1232,14 +1196,15 @@ tinsert( dna.D.criteriatree[UNIT_CRITERIA].children, { value='dna.CreateCriteria
 ----------------------------------------------------------------------------------------------
 dna.GetUnitPower=function(unit, powertype, bool)
 	dna.D.ResetDebugTimer()
-	local lReturn = dna.NilToNumeric(UnitPower(unit, powertype, bool))
+	-- https://wow.gamepedia.com/API_UnitPower
+	local lReturn = dna.NilToNumeric(UnitPower(unit, Enum.PowerType[powertype], bool))
 	dna.AppendActionDebug( 'GetUnitPower(unit='..tostring(unit)..",powertype="..tostring(powertype)..",bool="..tostring(bool)..')='..tostring(lReturn) )
 	return lReturn
 end
 dna.D.criteria["d/unit/GetUnitPower"]={
 	a=4,
 	a1l=L["d/common/un/l"],a1dv="player",a1tt=L["d/common/un/tt"],
-	a2l=L["d/common/power/l"],a2dv="SPELL_POWER_MANA",a2tt=L["d/common/power/tt"],
+	a2l=L["d/common/power/l"],a2dv="Mana",a2tt=L["d/common/power/tt"],
 	a3l=L["d/common/co/l"],a3dv="<",a3tt=L["d/common/co/tt"],
 	a4l=L["d/common/count/l"],a4dv="0",a4tt=L["d/common/count/tt"],
 	f=function () return format('dna.GetUnitPower(%q,%s)%s%s', dna.ui["ebArg1"]:GetText(), dna.ui["ebArg2"]:GetText(), dna.ui["ebArg3"]:GetText(), dna.ui["ebArg4"]:GetText()) end,
@@ -1250,8 +1215,8 @@ tinsert( dna.D.criteriatree[UNIT_CRITERIA].children, { value='dna.CreateCriteria
 dna.GetUnitPowerDeficit=function(unit, powertype, bool)
 	dna.D.ResetDebugTimer()
 	local l_return = -1
-	local l_current_power = dna.NilToNumeric(UnitPower(unit, powertype, bool))
-	local l_max_power = dna.NilToNumeric(UnitPowerMax(unit, powertype, bool))
+	local l_current_power = dna.NilToNumeric(UnitPower(unit, Enum.PowerType[powertype], bool))
+	local l_max_power = dna.NilToNumeric(UnitPowerMax(unit, Enum.PowerType[powertype], bool))
 	local l_return = l_max_power - l_current_power
 
 	dna.AppendActionDebug( 'GetUnitPowerDeficit(unit='..tostring(unit)..",powertype="..tostring(powertype)..",bool="..tostring(bool)..')='..tostring(l_return) )
@@ -1260,7 +1225,7 @@ end
 dna.D.criteria["d/unit/GetUnitPowerDeficit"]={
 	a=4,
 	a1l=L["d/common/un/l"],a1dv="player",a1tt=L["d/common/un/tt"],
-	a2l=L["d/common/power/l"],a2dv="SPELL_POWER_MANA",a2tt=L["d/common/power/tt"],
+	a2l=L["d/common/power/l"],a2dv="Mana",a2tt=L["d/common/power/tt"],
 	a3l=L["d/common/co/l"],a3dv="<",a3tt=L["d/common/co/tt"],
 	a4l=L["d/common/count/l"],a4dv="0",a4tt=L["d/common/count/tt"],
 	f=function () return format('dna.GetUnitPowerDeficit(%q,%s)%s%s', dna.ui["ebArg1"]:GetText(), dna.ui["ebArg2"]:GetText(), dna.ui["ebArg3"]:GetText(), dna.ui["ebArg4"]:GetText()) end,
@@ -2198,20 +2163,6 @@ dna.D.InitCriteriaClassTree=function()
 			f=function () return format('dna.GetUnitPower("player",SPELL_POWER_FOCUS)%s%s', dna.ui["ebArg1"]:GetText(), dna.ui["ebArg2"]:GetText()) end,
 		}
 		tinsert( dna.D.criteriatree[CLASS_CRITERIA].children, { value='dna.CreateCriteriaPanel("d/class/hunter/GetFocus")', text=L["d/class/hunter/GetFocus"] } )
-		--------------------------------------------------------------------------------------
-		dna.GetFocusDeficit=function(direction)
-			dna.D.ResetDebugTimer()
-			local lReturn = (UnitPowerMax("player",SPELL_POWER_FOCUS) - UnitPower("player",SPELL_POWER_FOCUS))
-			dna.AppendActionDebug( 'GetFocusDeficit()='..tostring(lReturn) )
-			return lReturn
-		end
-		dna.D.criteria["d/class/hunter/GetFocusDeficit"]={
-			a=2,
-			a1l=L["d/common/co/l"],a1dv=">=",a1tt=L["d/common/co/tt"],
-			a2l=L["d/common/focus/l"],a2dv="30",a2tt=L["d/common/focus/tt"],
-			f=function () return format('dna.GetFocusDeficit()%s%s', dna.ui["ebArg1"]:GetText(), dna.ui["ebArg2"]:GetText()) end,
-		}
-		tinsert( dna.D.criteriatree[CLASS_CRITERIA].children, { value='dna.CreateCriteriaPanel("d/class/hunter/GetFocusDeficit")', text=L["d/class/hunter/GetFocusDeficit"] } )
 	elseif (dna.D.PClass == "MAGE") then---------------------------------------------------------------------------------
 
 	elseif (dna.D.PClass == "MONK") then---------------------------------------------------------------------------------
