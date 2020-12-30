@@ -139,16 +139,9 @@ function dna:OnEnable()
 		end
 		return 0
 	end
-	dna.D.Threads = {}
 	
-	-- dna.D.ActionTypes = {
-		-- ["spell"]    =L["action/actiontypes/spell"],
-		-- ["macro"]    =L["action/actiontypes/macro"],
-		-- ["macrotext"]=L["action/actiontypes/macrotext"],
-		-- ["item"]     =L["action/actiontypes/item"],
-	-- }
-	--dna.D.ActionSortOrder = {	"spell", "macro", "macrotext", "item" }
-
+	dna.D.Threads = {}
+	dna.D.visibleNameplates = {}
 	dna.D.DebuffExclusions = {							-- Ignore these debbuffs for debuff type checking
 		[GetSpellInfo(15822)]   = true,					-- Dreamless Sleep
 		[GetSpellInfo(24360)]   = true,					-- Greater Dreamless Sleep
@@ -393,5 +386,8 @@ function dna:OnEnable()
 	dna:RegisterEvent("ACTIVE_TALENT_GROUP_CHANGED", "ACTIVE_TALENT_GROUP_CHANGED")
 	dna:RegisterEvent("PLAYER_REGEN_ENABLED", "PLAYER_REGEN_ENABLED")
 	dna:RegisterEvent("PLAYER_REGEN_DISABLED", "PLAYER_REGEN_DISABLED")
+	dna:RegisterEvent("NAME_PLATE_UNIT_ADDED", "NAME_PLATE_UNIT_ADDED");
+	dna:RegisterEvent("NAME_PLATE_UNIT_REMOVED", "NAME_PLATE_UNIT_REMOVED");
+	
     self.tEngine = self:ScheduleRepeatingTimer("fEngineOnTimer", .1)
 end

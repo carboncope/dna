@@ -6,6 +6,10 @@ local L       	= LibStub("AceLocale-3.0"):GetLocale("dna")
 --********************************************************************************************
 local strsub, strsplit, strlower, strmatch, strtrim, strfind = string.sub, string.split, string.lower, string.match, string.trim, string.find
 local format, tonumber, tostring = string.format, tonumber, tostring
+local TableInsert = tinsert;
+local TableRemove = tremove;
+local TableContains = tContains;
+local TableIndexOf = tIndexOf;
 
 function dna:OnCommReceived(prefix, message, distribution, sender)
     print('dna Comm Received')
@@ -19,33 +23,16 @@ function dna:OnCommReceived(prefix, message, distribution, sender)
 	end
 end
 
-local UnitAura = UnitAura
--- Unit Aura function that return info about the first Aura matching the spellName or spellID given on the unit.
-function dna:GetUnitAura(unit, spell, filter)
-	if filter and not filter:upper():find("FUL") then
-		filter = filter.."|HELPFUL" -- Auto append HELPFUL by default
-	end
 
-	local id = 1
-	while( true ) do
-		local name, _, _, _, _, _, _, _, _, spellId = UnitAura(unit, id, filter)
-		
-		if( not name ) then return end
-		if spell == spellId or spell == name then
-			return UnitAura(unit, id, filter)
-		end
-		id = id + 1
+function dna:NAME_PLATE_UNIT_ADDED(_, nameplateUnit)
+	if not TableContains(dna.D.visibleNameplates, nameplateUnit) then
+		TableInsert(dna.D.visibleNameplates, nameplateUnit);
 	end
 end
-
-function dna:GetUnitBuff(unit, spell, filter)
-  filter = filter and filter.."|HELPFUL" or "HELPFUL"
-  return dna:GetUnitAura(unit, spell, filter)
-end
-
-function dna:GetUnitDebuff(unit, spell, filter)
-  filter = filter and filter.."|HARMFUL" or "HARMFUL"
-  return dna:GetUnitAura(unit, spell, filter)
+function dna:NAME_PLATE_UNIT_REMOVED(_, nameplateUnit)
+	if TableIndexOf(dna.D.visibleNameplates, nameplateUnit) ~= nil then
+		TableRemove(dna.D.visibleNameplates, index)
+	end
 end
 
 function dna:UNIT_AURA(_,strUnitID)

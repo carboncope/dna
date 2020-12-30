@@ -22,6 +22,7 @@ local GetTime = GetTime
 local UnitExists = UnitExists
 local UnitGUID   = UnitGUID
 local UnitHealth = UnitHealth
+local UnitAura = UnitAura
 
 --********************************************************************************************
 -- Creat root tree tables
@@ -69,11 +70,38 @@ dna.AppendActionDebug=function( strText )
     end
     dna.strAPIFunctionsCalled = tostring(dna.strAPIFunctionsCalled).."\n"..format(" |cffF95C25[|r%.3f ms|cffF95C25]|r", dna.D.GetDebugTimerElapsed() )..tostring(strText)
 end
+
+-- Unit Aura function that return info about the first Aura matching the spellName or spellID given on the unit.
+function dna:GetUnitAura(unit, spell, filter)
+	-- https://wow.gamepedia.com/API_UnitAura
+	if filter and not filter:upper():find("FUL") then
+		filter = filter.."|HELPFUL" -- Auto append HELPFUL by default
+	end
+
+	local id = 1
+	while( true ) do
+		local name, _, _, _, _, _, _, _, _, spellId = UnitAura(unit, id, filter)
+		
+		if( not name ) then return end
+		if spell == spellId or spell == name then
+			return UnitAura(unit, id, filter)
+		end
+		id = id + 1
+	end
+end
+
+function dna:GetUnitBuff(unit, spell, filter)
+  filter = filter and filter.."|HELPFUL" or "HELPFUL"
+  return dna:GetUnitAura(unit, spell, filter)
+end
+
+function dna:GetUnitDebuff(unit, spell, filter)
+  filter = filter and filter.."|HARMFUL" or "HARMFUL"
+  return dna:GetUnitAura(unit, spell, filter)
+end
 ----------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------
 dna.fGetFrameInfo=function( frmTarget )
-
-
 	local strFrameName = ''
 	local strHotKey = nil
 	local nSlot	= 0
@@ -435,6 +463,45 @@ tinsert( dna.D.criteriatree[PET_CRITERIA].children, { value='dna.CreateCriteriaP
 --********************************************************************************************
 --UNIT CRITERIA
 --********************************************************************************************
+dna.GetUnitAuraRefreshable=function(unit,spell,filter,timeShift,missingIsRefreshable)
+	dna.D.ResetDebugTimer()
+	
+	name, _, _, _, duration, expirationTime, _, _, _, _, _, _, _, _, _ = dna:GetUnitAura(unit, spell, filter)
+	
+	local t = GetTime()
+	local lReturn = false
+	if name then
+		local remains = 0
+		local ltimeShift =  timeShift or 0
+
+		if expirationTime == nil then
+			remains = 0
+		elseif (expirationTime - t) > ltimeShift then
+			remains = expirationTime - t - ltimeShift
+		elseif expirationTime == 0 then
+			remains = 99999
+		end
+
+		lReturn = remains < 0.3 * duration
+	else
+		lReturn = missingIsRefreshable
+	end
+	
+	dna.AppendActionDebug( 'GetUnitAuraRefreshable(unit='..tostring(unit)..',spell='..tostring(spell)..',filter='..tostring(filter)..',timeShift='..tostring(ltimeShift)..',missingIsRefreshable='..tostring(missingIsRefreshable)..')='..tostring(lReturn) )
+	return lReturn
+end
+dna.D.criteria["d/unit/GetUnitAuraRefreshable"]={
+	a=5,
+	a1l=L["d/common/un/l"],a1dv="target",a1tt=L["d/common/un/tt"],
+	a2l=L["d/common/sp/l"],a2dv=L["d/common/sp/dv"],a2tt=L["d/common/sp/tt"],
+	a3l=L["d/common/aurafilter/l"],a3dv="PLAYER|HARMFUL",a3tt=L["d/common/aurafilter/tt"],
+	a4l=L["d/common/timeshift/l"],a4dv="0",a4tt=L["d/common/timeshift/tt"],
+	a5l=L["d/common/missingisrefreshable/l"],a5dv="true",a5tt=L["d/common/missingisrefreshable/tt"],
+	f=function () return format('dna.GetUnitAuraRefreshable(%q,%q,%q,%s)', dna.ui["ebArg1"]:GetText(), dna.ui["ebArg2"]:GetText(), dna.ui["ebArg3"]:GetText(), dna.ui["ebArg4"]:GetText(), dna.ui["ebArg5"]:GetText() ) end,
+}
+tinsert( dna.D.criteriatree[UNIT_CRITERIA].children, { value='dna.CreateCriteriaPanel("d/unit/GetUnitAuraRefreshable")', text=L["d/unit/GetUnitAuraRefreshable"] } )
+----------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------
 dna.GetUnitCastingInterruptibleSpell=function(unit)
 	dna.D.ResetDebugTimer()
 	local lReturn = false
@@ -612,7 +679,7 @@ dna.D.criteria["d/unit/GetUnitCastTimeleft"]={
 tinsert( dna.D.criteriatree[UNIT_CRITERIA].children, { value='dna.CreateCriteriaPanel("d/unit/GetUnitCastTimeleft")', text=L["d/unit/GetUnitCastTimeleft"] } )
 ----------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------
-dna.GetUnitDebuffTimeleftInList=function(unit,aura,filter)
+dna.GetUnitDebuffTimeleftInList=function(unit,list,filter)
 	dna.D.ResetDebugTimer()
 	local TreeLevel2=dna:SearchTable(dna.D.LTMC, "value", 'dna.CreateListPanel([=['..list..']=])')
 	for k, v in pairs(dna.D.LTMC[TreeLevel2].treeList) do
@@ -1046,6 +1113,83 @@ dna.D.criteria["d/unit/GetUnitHealthPercent"]={
 tinsert( dna.D.criteriatree[UNIT_CRITERIA].children, { value='dna.CreateCriteriaPanel("d/unit/GetUnitHealthPercent")', text=L["d/unit/GetUnitHealthPercent"] } )
 ----------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------
+dna.GetThreatUnitsInRangeOfItem=function(itemId,forcedCount)
+	dna.D.ResetDebugTimer()
+	local _, instanceType = IsInInstance()
+	local lReturn, units = dna.GetUnitsInThreat()
+
+	local itemToCheck = itemId or 18904;
+
+	-- 5 man content, we count battleground also as small party
+	if dna.GetUnitIsMelee('player') then
+		-- 8 yards range
+		itemToCheck = itemId or 61323;
+	elseif instanceType == 'pvp' or instanceType == 'party' then
+		-- 30 yards range
+		itemToCheck = itemId or 7734;
+	elseif instanceType == 'arena' and instanceType == 'raid' then
+		-- 35 yards range
+		itemToCheck = itemId or 18904
+	end
+
+	lReturn = 0;
+	for i = 1, #units do
+		-- 8 yards range check
+		if IsItemInRange(itemToCheck, units[i]) then
+			lReturn = lReturn + 1;
+		end
+	end
+	
+	if dna.NilToNumeric(forcedCount) > 0 then
+		lReturn = forcedCount
+	end
+	
+	dna.AppendActionDebug( 'GetThreatUnitsInRangeOfItem(itemId='..tostring(itemId)..',forcedCount='..tostring(forcedCount)..')='..tostring(lReturn) )
+
+	return lReturn
+end
+dna.D.criteria["d/unit/GetThreatUnitsInRangeOfItem"]={
+	a=4,
+	a1l=L["d/common/itemid/l"],a1dv="18904",a1tt=L["d/common/itemid/tt"],
+	a2l=L["d/common/forcednumber/l"],a2dv="nil",a2tt=L["d/common/forcednumber/tt"],
+	a3l=L["d/common/co/l"],a3dv=">=",a3tt=L["d/common/co/tt"],
+	a4l=L["d/common/number/l"],a4dv="4",a4tt=L["d/common/number/tt"],
+	f=function () return format('dna.GetThreatUnitsInRangeOfItem(%s,%s)%s%s', dna.ui["ebArg1"]:GetText(), dna.ui["ebArg2"]:GetText(), dna.ui["ebArg3"]:GetText(), dna.ui["ebArg4"]:GetText()) end,
+}
+tinsert( dna.D.criteriatree[UNIT_CRITERIA].children, { value='dna.CreateCriteriaPanel("d/unit/GetThreatUnitsInRangeOfItem")', text=L["d/unit/GetThreatUnitsInRangeOfItem"] } )
+----------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------
+function dna.GetUnitsInThreat()
+	local count = 0;
+	local units = {};
+
+	for _, unit in ipairs(dna.D.visibleNameplates) do
+		if UnitThreatSituation('player', unit) ~= nil then
+			count = count + 1;
+			tinsert(units, unit);
+		else
+			local npcId = select(6, strsplit('-', UnitGUID(unit)));
+			npcId = tonumber(npcId);
+			-- Risen Soul, Tormented Soul, Lost Soul
+			if npcId == 148716 or npcId == 148893 or npcId == 148894 then
+				count = count + 1;
+				tinsert(units, unit);
+			end
+		end
+	end
+
+	dna.AppendActionDebug( 'GetUnitsInThreat()='..tostring(lReturn) )
+	return count, units;
+end
+dna.D.criteria["d/unit/GetUnitsInThreat"]={
+	a=2,
+	a1l=L["d/common/co/l"],a1dv=">=",a1tt=L["d/common/co/tt"],
+	a2l=L["d/common/number/l"],a2dv="102",a2tt=L["d/common/number/tt"],
+	f=function () return format('dna.GetUnitsInThreat()%s%s', dna.ui["ebArg1"]:GetText(), dna.ui["ebArg2"]:GetText() ) end,
+}
+tinsert( dna.D.criteriatree[UNIT_CRITERIA].children, { value='dna.CreateCriteriaPanel("d/unit/GetUnitsInThreat")', text=L["d/unit/GetUnitsInThreat"] } )
+----------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------
 dna.GetUnitIsFriend=function(unit, otherunit)
 	dna.D.ResetDebugTimer()
 	local lReturn = False
@@ -1079,6 +1223,8 @@ tinsert( dna.D.criteriatree[UNIT_CRITERIA].children, { value='dna.CreateCriteria
 ----------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------
 dna.GetUnitIsMoving=function(unit)
+	local lReturn = 0
+
 	return (GetUnitSpeed(unit) > 0)
 end
 dna.D.criteria["d/unit/GetUnitIsMoving"]={
@@ -1087,6 +1233,33 @@ dna.D.criteria["d/unit/GetUnitIsMoving"]={
 	f=function () return format('dna.GetUnitIsMoving(%q)', dna.ui["ebArg1"]:GetText()) end,
 }
 tinsert( dna.D.criteriatree[UNIT_CRITERIA].children, { value='dna.CreateCriteriaPanel("d/unit/GetUnitIsMoving")', text=L["d/unit/GetUnitIsMoving"] } )
+----------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------
+dna.GetUnitIsMelee=function(unit)
+	local lReturn = false
+	local class = select(3, UnitClass(unit))
+	local spec = GetSpecialization()
+	
+	if class == 1 or class == 2 or class == 4 or class == 6 or class == 10 or class == 12 then -- Warrior, Paladin, Rogue, DeathKnight, Monk, Demon Hunter
+		lReturn = true
+	elseif class == 3 and spec == 3 then -- Survival Hunter
+		lReturn = true
+	elseif class == 7 and spec == 2 then -- Enh Shaman
+		lReturn = true
+	elseif class == 11 and (spec == 2 or spec == 3) then -- Guardian or Feral Druid
+		lReturn = true
+	end
+	
+	dna.AppendActionDebug( 'GetUnitIsMelee(unit='..tostring(unit)..')='..tostring(lReturn) )
+	
+	return lReturn;
+end
+dna.D.criteria["d/unit/GetUnitIsMelee"]={
+	a=1,
+	a1l=L["d/common/un/l"],a1dv="player",a1tt=L["d/common/un/tt"],
+	f=function () return format('dna.GetUnitIsMelee(%q)', dna.ui["ebArg1"]:GetText()) end,
+}
+tinsert( dna.D.criteriatree[UNIT_CRITERIA].children, { value='dna.CreateCriteriaPanel("d/unit/GetUnitIsMelee")', text=L["d/unit/GetUnitIsMelee"] } )
 ----------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------
 dna.GetUnitIsPlayerControlled=function(unit)
@@ -2323,24 +2496,27 @@ end
 --********************************************************************************************
 --TALENTS CRITERIA
 --********************************************************************************************
-dna.GetTalentEnabled=function(talent)
+dna.GetTalentEnabled=function(talentName)
 	dna.D.ResetDebugTimer()
-	lReturn = false
-
-	local lSpellName = GetSpellInfo(talent)
-	local lCurrentSpecGroup = GetActiveSpecGroup()
-	if ( lSpellName and lCurrentSpecGroup ) then
-		for lTier = 1, MAX_TALENT_TIERS do
-			for lColumn = 1, 3 do
-				talentID, name, iconTexture, selected, available = GetTalentInfo(lTier, lColumn, lCurrentSpecGroup )
-				if (name == lSpellName and selected) then
-					lReturn = true
-					break
-				end
-			end
-		end
+	local lReturn = false
+	local talentInfo = {}
+    local maxTiers = 7
+	local specPos = GetSpecialization()	
+	if not specPos or specPos < 1 or specPos > 4 then
+		return lReturn
 	end
-	dna.AppendActionDebug( 'GetTalentEnabled(talent='..tostring(talent)..')='..tostring(lReturn) )
+	
+    for tier = 1, maxTiers do
+        for col = 1, 3 do
+            local id, name, _, _, _, spellId, _, t, c, isSelected = GetTalentInfoBySpecialization(specPos, tier, col)
+			if (name and name == talentName and isSelected) then
+				lReturn = true
+				break
+			end
+        end
+    end
+
+	dna.AppendActionDebug( 'GetTalentEnabled(talent='..tostring(talentName)..')='..tostring(lReturn) )
 	return lReturn
 end
 dna.D.criteria["d/talents/GetTalentEnabled"]={
