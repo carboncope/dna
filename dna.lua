@@ -141,6 +141,7 @@ function dna:OnEnable()
 	end
 	
 	dna.D.Threads = {}
+	dna.D.binds = {}
 	dna.D.visibleNameplates = {}
 	dna.D.DebuffExclusions = {							-- Ignore these debbuffs for debuff type checking
 		[GetSpellInfo(15822)]   = true,					-- Dreamless Sleep

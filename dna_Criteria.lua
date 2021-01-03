@@ -1401,7 +1401,7 @@ dna.D.criteria["d/unit/GetUnitPowerDeficit"]={
 	a2l=L["d/common/power/l"],a2dv="Mana",a2tt=L["d/common/power/tt"],
 	a3l=L["d/common/co/l"],a3dv="<",a3tt=L["d/common/co/tt"],
 	a4l=L["d/common/count/l"],a4dv="0",a4tt=L["d/common/count/tt"],
-	f=function () return format('dna.GetUnitPowerDeficit(%q,%s)%s%s', dna.ui["ebArg1"]:GetText(), dna.ui["ebArg2"]:GetText(), dna.ui["ebArg3"]:GetText(), dna.ui["ebArg4"]:GetText()) end,
+	f=function () return format('dna.GetUnitPowerDeficit(%q,%q)%s%s', dna.ui["ebArg1"]:GetText(), dna.ui["ebArg2"]:GetText(), dna.ui["ebArg3"]:GetText(), dna.ui["ebArg4"]:GetText()) end,
 }
 tinsert( dna.D.criteriatree[UNIT_CRITERIA].children, { value='dna.CreateCriteriaPanel("d/unit/GetUnitPowerDeficit")', text=L["d/unit/GetUnitPowerDeficit"] } )
 ----------------------------------------------------------------------------------------------
@@ -1785,6 +1785,28 @@ tinsert( dna.D.criteriatree[SPELL_CRITERIA].children, { value='dna.CreateCriteri
 	-- f=function () return format('dna.GetSpellCurrentBonusDPS(%q,%s,%s)', dna.ui["ebArg1"]:GetText(), dna.ui["ebArg2"]:GetText(), dna.ui["ebArg3"]:GetText() ) end,
 -- }
 -- tinsert( dna.D.criteriatree[SPELL_CRITERIA].children, { value='dna.CreateCriteriaPanel("d/spell/GetSpellCurrentBonusDPS")', text=L["d/spell/GetSpellCurrentBonusDPS"] } )
+----------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------
+dna.GetSpellCastCount=function(spell)
+	dna.D.ResetDebugTimer()
+	local lReturn = 0
+	local lSpellId = (dna.GetSpellID(spell) or 0)
+
+	if ( dna.D.SpellInfo[tostring(lSpellId)] ) then
+		lReturn = dna.D.SpellInfo[tostring(lSpellId)].castcount
+	end
+	
+	dna.AppendActionDebug( 'GetSpellCastCount(spell='..tostring(spell)..')='..tostring(lReturn))
+	return lReturn
+end
+dna.D.criteria["d/spell/GetSpellCastCount"]={
+	a=3,
+	a1l=L["d/common/sp/l"],a1dv=L["d/common/sp/dv"],a1tt=L["d/common/sp/tt"],
+	a2l=L["d/common/co/l"],a2dv="==",a2tt=L["d/common/co/tt"],
+	a3l=L["d/common/number/l"],a3dv="2",a3tt=L["d/common/number/tt"],
+	f=function () return format('dna.GetSpellCastCount(%q)%s%s', dna.ui["ebArg1"]:GetText(), dna.ui["ebArg2"]:GetText(), dna.ui["ebArg3"]:GetText()) end,
+}
+tinsert( dna.D.criteriatree[SPELL_CRITERIA].children, { value='dna.CreateCriteriaPanel("d/spell/GetSpellCastCount")', text=L["d/spell/GetSpellCastCount"] } )
 ----------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------
 dna.GetSpellCastTime=function(spell)
@@ -2680,7 +2702,9 @@ function dna.SetWeakAuraInfo(_,dnaActionFrame,keyBind,spellName)
 		dnaActionFrame["_spellid"] = spellName
 	end
 	
-	if string.len(keyBind) == 1 then
+	if not keyBind then
+		dna.CurrentActionKeyBind = nil
+	elseif string.len(keyBind) == 1 then
 		dna.CurrentActionKeyBind = keyBind
 	end
 
@@ -2984,3 +3008,40 @@ dna.D.criteria["d/group/GetSpellNumberOfUnitsApplied"]={
 tinsert( dna.D.criteriatree[GROUP_CRITERIA].children, { value='dna.CreateCriteriaPanel("d/group/GetSpellNumberOfUnitsApplied")', text=L["d/group/GetSpellNumberOfUnitsApplied"] } )
 ----------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------
+function dna.GetMaxDpsGlowingKeybind(_,dnaActionFrame)
+	dna.D.ResetDebugTimer()
+	local lReturn=nil
+	local glowingSpell = nil
+
+	if (MaxDps.Spells) then
+		for spellId, button in pairs(MaxDps.Spells) do
+			if (MaxDps.SpellsGlowing[spellId] == 1) then
+				for buttonIndex, buttonTable in pairs(button) do
+					if ( dna.D.binds[buttonTable.keyBoundTarget] ) then
+						glowingSpell = spellId
+						lReturn = dna.D.binds[buttonTable.keyBoundTarget]
+						break
+					end
+				end
+			end
+		end
+	end
+	
+	if ( glowingSpell ~= nil and dnaActionFrame ) then
+		dnaActionFrame["_spellid"] = glowingSpell
+	end
+	
+	if lReturn == nil then
+		dna.CurrentActionKeyBind = nil
+	elseif string.len(lReturn) == 1 then
+		dna.CurrentActionKeyBind = lReturn
+	end
+	
+    dna.AppendActionDebug( 'GetMaxDpsGlowingKeybind()='..tostring(lReturn) )
+	return lReturn
+end
+dna.D.criteria["d/misc/GetMaxDpsGlowingKeybind"]={
+	a=0,
+	f=function () return format('dna:GetMaxDpsGlowingKeybind(select(1,...))~=nil' ) end,
+}
+tinsert( dna.D.criteriatree[MISC_CRITERIA].children, { value='dna.CreateCriteriaPanel("d/misc/GetMaxDpsGlowingKeybind")', text=L["d/misc/GetMaxDpsGlowingKeybind"] } )

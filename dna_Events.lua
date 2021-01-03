@@ -4,7 +4,7 @@ local L       	= LibStub("AceLocale-3.0"):GetLocale("dna")
 --********************************************************************************************
 -- Locals
 --********************************************************************************************
-local strsub, strsplit, strlower, strmatch, strtrim, strfind = string.sub, string.split, string.lower, string.match, string.trim, string.find
+local strsub, strsplit, strlower, strmatch, strtrim, strfind, strlen= string.sub, string.split, string.lower, string.match, string.trim, string.find, string.len
 local format, tonumber, tostring = string.format, tonumber, tostring
 local TableInsert = tinsert;
 local TableRemove = tremove;
@@ -77,9 +77,9 @@ end
 function dna:UNIT_SPELLCAST_START(event, casterUnit, castGUID, spellID)
 	name, rank, icon, castTime, minRange, maxRange, spellId = GetSpellInfo(spellID)
 	if ( spellId and casterUnit == "player" ) then
-        if spellId ~= 6603 then
-            dna.D.lastcastedspellid = spellId
-        end
+        -- if spellId ~= 6603 then -- Changed 1/2/2021 because only successful casts should be counted in UNIT_SPELLCAST_SUCCEEDED
+            -- dna.D.lastcastedspellid = spellId
+        -- end
 		if spellId == dna.nLastSpellCastStartId then
 			dna.nRunningSpellCastStartCount = (dna.nRunningSpellCastStartCount or 0) + 1
 			dna:doprint("dna.nRunningSpellCastStartCount="..dna.nRunningSpellCastStartCount)
@@ -107,9 +107,9 @@ end
 function dna:UNIT_SPELLCAST_CHANNEL_START(event, casterUnit, castGUID, spellID)
 	name, rank, icon, castTime, minRange, maxRange, spellId = GetSpellInfo(spellID)
 	if ( spellId and casterUnit == "player" ) then
-        if spellId ~= 6603 then
-            dna.D.lastcastedspellid = spellId
-        end
+        -- if spellId ~= 6603 then -- Changed 1/2/2021 because only successful casts should be counted in UNIT_SPELLCAST_SUCCEEDED
+            -- dna.D.lastcastedspellid = spellId
+        -- end
 		dna.SetSpellInfo( spellId, 'lastcastedtime', GetTime())
 		dna:doprint(GetTime().." UNIT_SPELLCAST_CHANNEL_START:Player "..tostring(numSpellId).." "..tostring(dna.GetSpellName(numSpellId)))
 	end
@@ -130,8 +130,17 @@ function dna:UNIT_SPELLCAST_SUCCEEDED(event, casterUnit, castGUID, spellID)
 	--https://wow.gamepedia.com/API_GetSpellInfo
 	name, rank, icon, castTime, minRange, maxRange, spellId = GetSpellInfo(spellID)
 	if ( spellId and casterUnit == "player" ) then
+
+		
 		if ( dna.GetSpellCastTime(spellId) == 0 ) then				-- Only update last casted time for instant or channeled spells
             if spellId ~= 6603 then
+				-- Before we update last casted spell, check if the spell changed from last time and reset the count to zero
+				if (dna.D.lastcastedspellid ~= spellId) then
+					dna.SetSpellInfo( dna.D.lastcastedspellid, 'castcount', 0)
+					dna.SetSpellInfo( spellId, 'castcount', 1)
+				else
+					dna.D.SpellInfo[tostring(spellId)].castcount = dna.D.SpellInfo[tostring(spellId)].castcount + 1
+				end
                 dna.D.lastcastedspellid = spellId
             end
 			dna.SetSpellInfo( spellId, 'lastcastedtime', GetTime())
@@ -143,7 +152,7 @@ function dna:UNIT_SPELLCAST_SUCCEEDED(event, casterUnit, castGUID, spellID)
 			dna.SetSpellInfo( spellId, 'lastcastedtime', GetTime())
 			dna:doprint(GetTime().." UNIT_SPELLCAST_SUCCEEDED:Pet spellid["..tostring(spellId).."] spellname["..tostring(name)..']')
 		end
-	end
+	end	
     if ( spellId and casterUnit ~= "player" and not UnitIsFriend(casterUnit, "player" ) ) then
         if ( dna.GetUnitCastingInterruptibleSpell(casterUnit) ) then
             dna.AddListEntry( 'NPC_INTERRUPTABLE', false, spellId, 's' )
@@ -162,6 +171,19 @@ function dna:PLAYER_ENTERING_WORLD()
 		self:SetRotationForCurrentSpec()								-- Select the rotation that matches the current specialization or talentgroup
 	else
 		dna.ui.SelectRotation(dna.D.OTM[dna.D.PClass].selectedrotation, false) 		  		-- Select the last loaded rotation
+	end
+	
+
+	for buttonIndex=1, GetNumBindings() do
+		local command, category, key1, key2, result3 = GetBinding(buttonIndex)
+		if ( command ) then
+			--dna:dprint('    buttonIndex['..buttonIndex..'] key1['..tostring(key1)..'] key2['..tostring(key2)..']') 
+			if ( key1 and strlen(key1) == 1 ) then
+				dna.D.binds[command] = key1
+			elseif ( key2 and strlen(key2) == 1 ) then
+				dna.D.binds[command] = key2
+			end
+		end
 	end
 end
 
