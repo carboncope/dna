@@ -1,11 +1,7 @@
-commit 27491205e5949d04190208967f96cc3686335e63 (HEAD -> main)
+commit 785960ea2d636ef7fe8a57937755658adc72f6ec (HEAD -> main)
 Author: carboncope <>
-Date:   Wed Dec 30 11:26:57 2020 -0700
+Date:   Sun Jan 3 10:46:21 2021 -0700
 
-    1.0.16-alpha
-    Added GetUnitAuraRefreshable
-    Fixed GetUnitDebuffTimeleftInList
-    Added GetThreatUnitsInRangeOfItem
-    Added GetUnitsInThreat
-    Added GetUnitIsMelee
-    Fxied GetTalentEnabled
+    1.0.17-alpha
+    Added dna.GetSpellCastCount
+    Added dna:GetMaxDpsGlowingKeybind
