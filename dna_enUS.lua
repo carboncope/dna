@@ -62,10 +62,13 @@ L["lists/mlebListImport/l"]						= "List Import (Ctrl+V):"
 --*****************************************************
 --List Panel
 --*****************************************************
-L["list/ebListExport/l"]						= "List Export (Ctrl+C):"
-L["list/ebListExport/tt"]						= "Press the export button then Ctrl+C,Ctrl+V to share this list in a forum"
-L["list/bListExport/l"]							= "Export"
-L["list/bListExport/tt"]						= "Click to export 1 line format\nShift+click to export script format\nAlt+click to export forum format"
+L["list/ebListExport/l"] = "List Export (Ctrl+C):"
+L["list/ebListExport/tt"] = "Press the export button then Ctrl+C,Ctrl+V to share this list in a forum"
+L["list/bListExport/l"]	= "Export"
+L["list/bListExport/tt"] = "Click to export 1 line format\nShift+click to export script format\nAlt+click to export forum format"
+L["list/bListSort/l"] = "Sort List"
+L["list/bListSort/tt"]	= "Click to sort the list alphabetically"
+
 L["list/ebShareListExport/l"]					= "Share List:"
 L["list/ebShareListExport/tt"]					= "Enter the name of the player to send list to:\n|cffF95C25Playername|r or\n|cffF95C25Playername-RealmNoSpaces|r"
 L["list/ebRenameList/l"]						= "Rename List:"

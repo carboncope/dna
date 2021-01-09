@@ -1,7 +1,6 @@
-commit 785960ea2d636ef7fe8a57937755658adc72f6ec (HEAD -> main)
+commit 03c89b15802819b2da1bcb07491467043e7510e9 (HEAD -> main)
 Author: carboncope <>
-Date:   Sun Jan 3 10:46:21 2021 -0700
+Date:   Sat Jan 9 08:01:41 2021 -0700
 
-    1.0.17-alpha
-    Added dna.GetSpellCastCount
-    Added dna:GetMaxDpsGlowingKeybind
+    1.0.18-alpha
+    Added list sorting button

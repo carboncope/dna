@@ -66,8 +66,8 @@ function dna.AddListEntry( ListName, ShowError, ID, Type )
 	else
 		if ( dna.ui.sgMain ) then dna.ui.fMain:SetStatusText( '' ) end -- Clear any previous errors
         
-		table.insert( dna.D.LTMC[nListKey].treeList, tNewEntry)
-        dna.D.LTMC[nListKey].entries[strNewEntryText]=true
+		table.insert( dna.D.LTMC[nListKey].treeList, tNewEntry) -- Insert into the List Tree Main Children for user visibility
+        dna.D.LTMC[nListKey].entries[strNewEntryText]=true -- Insert into the List Tree Main Children entries for fast lookup
 	end
 	nNewEntryKey= dna:SearchTable(dna.D.LTMC[nListKey].treeList, "value", 'dna.ui.CreateListEntryPanel("'..ID..'","'..Type..'")')
 	if ( dna.ui.sgMain ) then dna.ui.sgMain.tgMain:RefreshTree() end
@@ -189,6 +189,21 @@ function dna.CreateListPanel(ListName)
 		ebListExport.editbox:SetFocus(0)
 		ebListExport.editbox:SetCursorPosition(0)
 		ebListExport.editbox:HighlightText()
+	end )
+	
+	-- Sort List button
+	local bListSort = dna.lib_acegui:Create("Button")
+	dna.ui.sgMain.tgMain.sgPanel:AddChild( bListSort )
+	bListSort:SetText( L["list/bListSort/l"] )
+	bListSort:SetWidth(100)
+	bListSort:SetPoint("TOPLEFT", bListExport.frame, "BOTTOMLEFT", 0, 0);
+	bListSort:SetCallback( "OnEnter", function(self) dna.ui.ShowTooltip(self.frame, L["list/bListSort/tt"], "BOTTOMRIGHT", "TOPRIGHT", 0, 0, "text") end )
+	bListSort:SetCallback( "OnLeave", function() dna.ui.HideTooltip() end )
+	bListSort:SetCallback( "OnClick", function()
+		local nListKey = dna.ui.STL[2]
+		table.sort(dna.D.LTMC[nListKey].treeList, function(a,b) return a.text < b.text end) -- sort list ascending by spell or item text
+		local strSelectedList = dna.D.LTMC[dna.ui.STL[2]].value
+		dna.ui.sgMain.tgMain:SelectByValue(dna.D.LTM.value.."\001"..strSelectedList) -- Click back on main list: Require the user to click another spell and update dna.ui.SelectedListEntryKey
 	end )
 
 	-- Spell Link interactive label
