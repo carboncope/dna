@@ -1,6 +1,6 @@
-commit 0d5089995ecbf2056622bdfb0cf8b2abedbe0b2e (HEAD -> main)
+commit e6fde97a88e3ed38b4fcbab5379e0ccbd8cf7bb3 (HEAD -> main)
 Author: carboncope <>
-Date:   Sun Jan 10 13:17:38 2021 -0700
+Date:   Sun Jan 10 13:51:32 2021 -0700
 
-    1.0.20-release
-    Fixed toggle spell watch not auto turning off the toggle
+    1.0.21-release
+    Fixed toggle displaying late delay

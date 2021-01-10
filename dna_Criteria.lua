@@ -2598,12 +2598,21 @@ dna.CreateToggle=function( nToggleNumber, nXOffset, nYOffset, nSize, strSpell, s
 	dna.D.ResetDebugTimer()
 	local bReturn = true
 	local t = GetTime()
+	
+	if not dna.frmToggle then dna.frmToggle = {} end
+	if not dna.txtToggle then dna.txtToggle = {} end
+
+	if (dna.txtToggle[nToggleNumber]) then
+		if ( dna.bToggle[nToggleNumber] == true ) then
+			dna.txtToggle[nToggleNumber]:SetAlpha(1)
+		else
+			dna.txtToggle[nToggleNumber]:SetAlpha(0)
+		end
+	end
+	
 	if (not dna.IsBlank(strSpell)) then
 		local _, _, strIcon, _, _, _, spellID = GetSpellInfo(strSpell)
 	
-		if not dna.frmToggle then dna.frmToggle = {} end
-		if not dna.txtToggle then dna.txtToggle = {} end
-
 		if not dna.frmToggle[nToggleNumber] and nXOffset ~= nil then
 			dna.frmToggle[nToggleNumber] = CreateFrame("Frame","frmToggle["..tostring(nToggleNumber).."]",UIParent);
 			dna.frmToggle[nToggleNumber]:ClearAllPoints();
@@ -2627,12 +2636,6 @@ dna.CreateToggle=function( nToggleNumber, nXOffset, nYOffset, nSize, strSpell, s
 
 		if strIcon then
 			dna.txtToggle[nToggleNumber]:SetTexture( strIcon )
-		end
-
-		if ( dna.bToggle[nToggleNumber] == true ) then
-			dna.txtToggle[nToggleNumber]:SetAlpha(1)
-		else
-			dna.txtToggle[nToggleNumber]:SetAlpha(0)
 		end
 
 		dna.AppendActionDebug( 'CreateToggle(nToggleNumber='..tostring(nToggleNumber)..
