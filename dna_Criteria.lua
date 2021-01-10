@@ -2651,11 +2651,12 @@ dna.CreateToggle=function( nToggleNumber, nXOffset, nYOffset, nSize, strSpell, s
 			gcd = gduration - (t - gstart);
 			if gcd < 0 then
 				gcd = 0
-			end
-			
+			end			
 			local nSpellWatchCD = dna.GetSpellCooldown(strSpellWatch)
+			local diff = abs(nSpellWatchCD - gcd)
 
-			if (nSpellWatchCD > gcd) then
+			-- We are rarely able to catch gcd = zero so its not a good check
+			if (diff > .5 and nSpellWatchCD > gcd ) then -- The spell watch cooldown is significantly more than the GCD which means turn it off because we are not in GCD
 				dna.bToggle[nToggleNumber] = false
 				dna.txtToggle[nToggleNumber]:SetAlpha(0)
 			end

@@ -1,6 +1,6 @@
-commit e6fde97a88e3ed38b4fcbab5379e0ccbd8cf7bb3 (HEAD -> main)
+commit 057fa057dfc16470d665a3cf5a3f6c3ebab5b03a (HEAD -> main)
 Author: carboncope <>
-Date:   Sun Jan 10 13:51:32 2021 -0700
+Date:   Sun Jan 10 15:12:05 2021 -0700
 
-    1.0.21-release
-    Fixed toggle displaying late delay
+    1.0.22-alpha
+    Fixed toggle turn on being forced off very quickly looking like it never turned on
