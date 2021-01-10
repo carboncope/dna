@@ -770,7 +770,7 @@ tinsert( dna.D.criteriatree[UNIT_CRITERIA].children, { value='dna.CreateCriteria
 ----------------------------------------------------------------------------------------------
 dna.GetUnitHasBuffIDStacks=function(unit,aura,filter)
 	dna.D.ResetDebugTimer()
-	local lReturn = dna.NilToNumeric(select(4,dna:GetUnitBuff(unit, dna.GetSpellName(aura), filter)))
+	local lReturn = dna.NilToNumeric(select(3,dna:GetUnitBuff(unit, dna.GetSpellName(aura), filter)))
 
 	dna.AppendActionDebug( 'GetUnitHasBuffNameStacks(unit='..tostring(unit)..',buff='..tostring(buff)..',filter='..tostring(filter)..')='..tostring(lReturn) )
 	return dna.NilToNumeric(lReturn)
@@ -831,7 +831,7 @@ tinsert( dna.D.criteriatree[UNIT_CRITERIA].children, { value='dna.CreateCriteria
 ----------------------------------------------------------------------------------------------
 dna.GetUnitHasBuffNameStacks=function(unit, aura, filter)
 	dna.D.ResetDebugTimer()
-	local lReturn = dna.NilToNumeric(select(4,dna:GetUnitAura(unit, dna.GetSpellName(aura), filter)))
+	local lReturn = dna.NilToNumeric(select(3,dna:GetUnitAura(unit, dna.GetSpellName(aura), filter)))
 
 	dna.AppendActionDebug( 'GetUnitHasBuffNameStacks(unit='..tostring(unit)..',buff='..tostring(buff)..',filter='..tostring(filter)..')='..tostring(lReturn) )
 	return dna.NilToNumeric(lReturn)
@@ -2550,6 +2550,13 @@ tinsert( dna.D.criteriatree[TALENTS_CRITERIA].children, { value='dna.CreateCrite
 --********************************************************************************************
 --MISC CRITERIA
 --********************************************************************************************
+dna.D.criteria["d/misc/EnableLua"]={
+	a=0,
+	f=function () return format('--_dna_enable_lua') end
+}
+tinsert( dna.D.criteriatree[MISC_CRITERIA].children, { value='dna.CreateCriteriaPanel("d/misc/EnableLua")', text=L["d/misc/EnableLua"] } )
+----------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------
 dna.GetActionCriteriaState=function(actionName)
 	dna.D.ResetDebugTimer()
 	local lReturn = false
@@ -2587,12 +2594,12 @@ dna.D.criteria["d/misc/GetActionDisabled"]={
 tinsert( dna.D.criteriatree[MISC_CRITERIA].children, { value='dna.CreateCriteriaPanel("d/misc/GetActionDisabled")', text=L["d/misc/GetActionDisabled"] } )
 ----------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------
-dna.GetToggleEnabled=function( nToggleNumber, nXOffset, nYOffset, nSize, strSpell, strSpellWatch )
+dna.CreateToggle=function( nToggleNumber, nXOffset, nYOffset, nSize, strSpell, strSpellWatch )
 	dna.D.ResetDebugTimer()
 	local bReturn = false
 
 	if (not dna.IsBlank(strSpell)) then
-		local name, rank, strIcon, castingTime, minRange, maxRange, spellID = GetSpellInfo(strSpell)
+		local _, _, strIcon, _, _, _, spellID = GetSpellInfo(strSpell)
 
 		if not dna.frmToggle then dna.frmToggle = {} end
 		if not dna.txtToggle then dna.txtToggle = {} end
@@ -2629,7 +2636,7 @@ dna.GetToggleEnabled=function( nToggleNumber, nXOffset, nYOffset, nSize, strSpel
 			dna.txtToggle[nToggleNumber]:SetAlpha(0)
 		end
 
-		dna.AppendActionDebug( 'GetToggleEnabled(nToggleNumber='..tostring(nToggleNumber)..
+		dna.AppendActionDebug( 'CreateToggle(nToggleNumber='..tostring(nToggleNumber)..
 								',nXOffset='..tostring(nXOffset)..
 								',nYOffset='..tostring(nYOffset)..
 								',nSize='..tostring(nSize)..
@@ -2648,25 +2655,19 @@ dna.GetToggleEnabled=function( nToggleNumber, nXOffset, nYOffset, nSize, strSpel
 				dna.txtToggle[nToggleNumber]:SetAlpha(0)
 			end
 		end
-
-	else
-		if ( dna.bToggle[nToggleNumber] == true ) then
-			bReturn = true
-		end
-		dna.AppendActionDebug( 'GetToggleEnabled(nToggleNumber='..tostring(nToggleNumber)..')='..tostring(bReturn) )
 	end
 
 	return bReturn
 end
-dna.D.criteria["d/misc/GetToggleEnabled"]={
+dna.D.criteria["d/misc/CreateToggle"]={
 	a=6,
 	a1l=L["d/common/togglenumber/l"],a1dv="1",a1tt=L["d/common/togglenumber/tt"],
 	a2l=L["d/common/xoffset/l"],a2dv="-64",a2tt=L["d/common/xoffset/tt"],
 	a3l=L["d/common/yoffset/l"],a3dv="0",a3tt=L["d/common/yoffset/tt"],
 	a4l=L["d/common/iconsize/l"],a4dv="32",a4tt=L["d/common/iconsize/tt"],
-	a5l=L["d/common/sp/l"],a5dv=L["d/common/sp/dv"],a5tt=L["d/common/sp/tt"],
-	a6l=L["d/common/spcdwatch/l"],a6dv=L["d/common/spcdwatch/dv"],a6tt=L["d/common/spcdwatch/tt"],
-	f=function () return format('dna.GetToggleEnabled(%s,%s,%s,%s,%q,%q)',
+	a5l=L["d/common/sp/l"],a5dv=L["d/common/sp/dv"],a5tt=L["d/common/togglespell/tt"],
+	a6l=L["d/common/spcdwatch/l"],a6dv=L["d/common/spcdwatch/dv"],a6tt=L["d/common/togglespellwatch/tt"],
+	f=function () return format('dna.CreateToggle(%s,%s,%s,%s,%q,%q)',
 		dna.ui["ebArg1"]:GetText(),
 		dna.ui["ebArg2"]:GetText(),
 		dna.ui["ebArg3"]:GetText(),
@@ -2674,6 +2675,26 @@ dna.D.criteria["d/misc/GetToggleEnabled"]={
 		dna.ui["ebArg5"]:GetText(),
 		dna.ui["ebArg6"]:GetText()
 		)
+	end,
+}
+tinsert( dna.D.criteriatree[MISC_CRITERIA].children, { value='dna.CreateCriteriaPanel("d/misc/CreateToggle")', text=L["d/misc/CreateToggle"] } )
+----------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------
+dna.GetToggleEnabled=function( nToggleNumber )
+	dna.D.ResetDebugTimer()
+	local bReturn = false
+
+	if ( dna.bToggle[nToggleNumber] == true ) then
+		bReturn = true
+	end
+	dna.AppendActionDebug( 'GetToggleEnabled(nToggleNumber='..tostring(nToggleNumber)..')='..tostring(bReturn) )
+
+	return bReturn
+end
+dna.D.criteria["d/misc/GetToggleEnabled"]={
+	a=1,
+	a1l=L["d/common/togglenumber/l"],a1dv="1",a1tt=L["d/common/togglenumber/tt"],
+	f=function () return format('dna.GetToggleEnabled(%s)', dna.ui["ebArg1"]:GetText() )
 	end,
 }
 tinsert( dna.D.criteriatree[MISC_CRITERIA].children, { value='dna.CreateCriteriaPanel("d/misc/GetToggleEnabled")', text=L["d/misc/GetToggleEnabled"] } )

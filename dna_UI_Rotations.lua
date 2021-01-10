@@ -48,7 +48,7 @@ function dna.fGetRotationExport()
 	for nActionKey, tAction in pairs(tExport.data.children) do		
 		tAction.fCriteria = nil
 	end
-	strExport = dna.Serialize(tExport)
+	strExport = dna.SerializeRotation(tExport)
 	return strExport
 end
 

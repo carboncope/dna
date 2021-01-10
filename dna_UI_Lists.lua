@@ -368,10 +368,6 @@ function dna.fGetListExport()
 	local tExport = {}
 	tExport.strType = "list"
 	tExport.data = dna.D.LTMC[dna.ui.STL[2]]
-	-- Loop through the actions and remove the .fFunction because ace serializer cannot handle them
-	-- for nActionKey, tAction in pairs(tExport.data.children) do
-		-- tAction.fCriteria = nil
-	-- end
 	strExport = dna.Serialize(tExport)
 	return strExport
 end

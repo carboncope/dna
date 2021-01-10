@@ -1,6 +1,11 @@
-commit 03c89b15802819b2da1bcb07491467043e7510e9 (HEAD -> main)
+commit 9ac75b3c76e84f404ec95dad3cdda7f4bddfd61b (HEAD -> main)
 Author: carboncope <>
-Date:   Sat Jan 9 08:01:41 2021 -0700
+Date:   Sun Jan 10 12:32:12 2021 -0700
 
-    1.0.18-alpha
-    Added list sorting button
+    1.0.19-release
+    Fixed dna.GetUnitHasBuffIDStacks
+    Fixed dna.GetUnitHasBuffNameStacks
+    Added misc/EnableLua to Misc tree criteria
+    Added misc/CreateToggle to create the toggle
+    Changed dna.GetToggleEnabled to just simply check the toggle
+    Fixed list exporting with a entry with a single quote e.g. Death's Embrace
