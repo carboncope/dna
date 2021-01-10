@@ -1,11 +1,6 @@
-commit 9ac75b3c76e84f404ec95dad3cdda7f4bddfd61b (HEAD -> main)
+commit 0d5089995ecbf2056622bdfb0cf8b2abedbe0b2e (HEAD -> main)
 Author: carboncope <>
-Date:   Sun Jan 10 12:32:12 2021 -0700
+Date:   Sun Jan 10 13:17:38 2021 -0700
 
-    1.0.19-release
-    Fixed dna.GetUnitHasBuffIDStacks
-    Fixed dna.GetUnitHasBuffNameStacks
-    Added misc/EnableLua to Misc tree criteria
-    Added misc/CreateToggle to create the toggle
-    Changed dna.GetToggleEnabled to just simply check the toggle
-    Fixed list exporting with a entry with a single quote e.g. Death's Embrace
+    1.0.20-release
+    Fixed toggle spell watch not auto turning off the toggle

@@ -2596,11 +2596,11 @@ tinsert( dna.D.criteriatree[MISC_CRITERIA].children, { value='dna.CreateCriteria
 ----------------------------------------------------------------------------------------------
 dna.CreateToggle=function( nToggleNumber, nXOffset, nYOffset, nSize, strSpell, strSpellWatch )
 	dna.D.ResetDebugTimer()
-	local bReturn = false
-
+	local bReturn = true
+	local t = GetTime()
 	if (not dna.IsBlank(strSpell)) then
 		local _, _, strIcon, _, _, _, spellID = GetSpellInfo(strSpell)
-
+	
 		if not dna.frmToggle then dna.frmToggle = {} end
 		if not dna.txtToggle then dna.txtToggle = {} end
 
@@ -2631,7 +2631,6 @@ dna.CreateToggle=function( nToggleNumber, nXOffset, nYOffset, nSize, strSpell, s
 
 		if ( dna.bToggle[nToggleNumber] == true ) then
 			dna.txtToggle[nToggleNumber]:SetAlpha(1)
-			bReturn = true
 		else
 			dna.txtToggle[nToggleNumber]:SetAlpha(0)
 		end
@@ -2643,14 +2642,17 @@ dna.CreateToggle=function( nToggleNumber, nXOffset, nYOffset, nSize, strSpell, s
 								',strSpell='..tostring(strSpell)..
 								',strSpellWatch='..tostring(strSpellWatch)..
 								')='..tostring(bReturn) )
-		-- dna:dprint( "strSpellWatch="..tostring(strSpellWatch))
+
 		if not dna.IsBlank( strSpellWatch ) then
-			local nSpellWatchCD = dna.GetSpellCooldown(strSpellWatch)
-			local _, nSpellWatchDuration = GetSpellCooldown(strSpellWatch or 61304 )
+			local gstart, gduration = GetSpellCooldown(61304)  -- GCD Global cooldown spell id
+			gcd = gduration - (t - gstart);
+			if gcd < 0 then
+				gcd = 0
+			end
 			
-			local nTimeInCD = ( nSpellWatchDuration - nSpellWatchCD )
-			-- You have to wait 2 seconds before turning a toggle back on
-			if nTimeInCD < 2 and nSpellWatchCD > 2 then
+			local nSpellWatchCD = dna.GetSpellCooldown(strSpellWatch)
+
+			if (nSpellWatchCD > gcd) then
 				dna.bToggle[nToggleNumber] = false
 				dna.txtToggle[nToggleNumber]:SetAlpha(0)
 			end
