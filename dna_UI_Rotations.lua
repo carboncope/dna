@@ -22,6 +22,9 @@ function dna.ui.SelectRotation(rotationname, bQuiet)
 				dna.bToggle[nToggleId] = false
 			end
 		end
+		
+		-- time stamp the rotation switch
+		dna.last_rotation_switch_timestamp = GetTime()
         
         dna.ui.fUpdateMenuText()
 
@@ -42,8 +45,10 @@ end
 
 function dna.fGetRotationExport()
 	local tExport = {}
+	tExport.data = {}
 	tExport.strType = "rotation"
-	tExport.data = dna.D.RTMC[dna.ui.STL[2]]
+	tExport.data = dna:CopyTable( dna.D.RTMC[dna.ui.STL[2]] )
+
 	-- Loop through the actions and remove the .fFunction because ace serializer cannot handle them
 	for nActionKey, tAction in pairs(tExport.data.children) do		
 		tAction.fCriteria = nil
@@ -127,7 +132,7 @@ function dna.AddRotation( RotationName, ShowError, nSpecialization )
         end
 	end
 	if ( dna.ui.sgMain ) then dna.ui.sgMain.tgMain:RefreshTree() end	
-	dna.AButtons.bInitComplete = false	-- Rotation was added
+	-- dna.AButtons.bInitComplete = false	-- Rotation was added
 	return lNewRotationText, lRotationExists
 end
 
@@ -155,7 +160,7 @@ function dna.DeleteRotation( RotationName )
 			dna.D.OTM[dna.D.PClass].selectedrotation  = nil
 		end
 		if ( dna.ui.fMain and bHideGUI ) then dna.ui.fMain:Hide() end					-- Hide the main gui if deleting from localization file
-		dna.AButtons.bInitComplete = false												-- Rotation was deleted
+		-- dna.AButtons.bInitComplete = false												-- Rotation was deleted
 		dna.ui.HideTooltip()
 		if ( dna.ui.sgMain ) then
 			dna.ui.sgMain.tgMain:RefreshTree() 										-- Gets rid of the rotation from the tree
@@ -267,7 +272,7 @@ function dna.SetRotationPanel(RotationName)
 	dna.ui.SelectRotation(dna.DB.global.treeMain[dna.ui.STL[1]].children[dna.ui.STL[2]].text, true)
 	-- Pause or resume the rightsgPanel fill layout if you need it or not
 	dna.ui.sgMain.tgMain.sgPanel:PauseLayout()
-	dna.AButtons.bInitComplete = false	-- Rotation Panel gui was opened
+	-- dna.AButtons.bInitComplete = false	-- Rotation Panel gui was opened
 
 	-- Rename Rotation edit box
 	local ebRenameRotation = dna.lib_acegui:Create("EditBox")
@@ -445,7 +450,7 @@ function dna.ui.ebRenameRotationOnEnterPressed(...)
 		dna.DB.global.treeMain[dna.ui.STL[1]].children[dna.ui.STL[2]].text = NewRotationText
 		dna.DB.global.treeMain[dna.ui.STL[1]].children[dna.ui.STL[2]].value = NewRotationValue
 		dna.ui.sgMain.tgMain:RefreshTree() 									-- Refresh the tree
-		dna.AButtons.bInitComplete = false										-- Rotation was renamed
+		-- dna.AButtons.bInitComplete = false										-- Rotation was renamed
 		dna.ui.sgMain.tgMain:SelectByValue(dna.D.RTM.value.."\001"..NewRotationValue)
 	end
 end
@@ -476,7 +481,7 @@ function dna.ui.ebCopyRotationOnEnterPressed(...)
 		NewRotation.value = 'dna.SetRotationPanel([=['..args[3]..']=])'
 		table.insert( dna.D.RTMC, NewRotation)
 		dna.ui.sgMain.tgMain:RefreshTree() 									-- Gets rid of the action from the tree
-		dna.AButtons.bInitComplete = false										-- Rotation was copied
+		-- dna.AButtons.bInitComplete = false										-- Rotation was copied
 	end
 end
 

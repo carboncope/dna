@@ -173,18 +173,7 @@ function dna:PLAYER_ENTERING_WORLD()
 		dna.ui.SelectRotation(dna.D.OTM[dna.D.PClass].selectedrotation, false) 		  		-- Select the last loaded rotation
 	end
 	
-
-	for buttonIndex=1, GetNumBindings() do
-		local command, category, key1, key2, result3 = GetBinding(buttonIndex)
-		if ( command ) then
-			--dna:dprint('    buttonIndex['..buttonIndex..'] key1['..tostring(key1)..'] key2['..tostring(key2)..']') 
-			if ( key1 and strlen(key1) == 1 ) then
-				dna.D.binds[command] = key1
-			elseif ( key2 and strlen(key2) == 1 ) then
-				dna.D.binds[command] = key2
-			end
-		end
-	end
+	dna:scan_buttons()
 end
 
 function dna:PLAYER_REGEN_ENABLED()

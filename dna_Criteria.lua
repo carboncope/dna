@@ -497,7 +497,7 @@ dna.D.criteria["d/unit/GetUnitAuraRefreshable"]={
 	a3l=L["d/common/aurafilter/l"],a3dv="PLAYER|HARMFUL",a3tt=L["d/common/aurafilter/tt"],
 	a4l=L["d/common/timeshift/l"],a4dv="0",a4tt=L["d/common/timeshift/tt"],
 	a5l=L["d/common/missingisrefreshable/l"],a5dv="true",a5tt=L["d/common/missingisrefreshable/tt"],
-	f=function () return format('dna.GetUnitAuraRefreshable(%q,%q,%q,%s)', dna.ui["ebArg1"]:GetText(), dna.ui["ebArg2"]:GetText(), dna.ui["ebArg3"]:GetText(), dna.ui["ebArg4"]:GetText(), dna.ui["ebArg5"]:GetText() ) end,
+	f=function () return format('dna.GetUnitAuraRefreshable(%q,%q,%q,%s,%s)', dna.ui["ebArg1"]:GetText(), dna.ui["ebArg2"]:GetText(), dna.ui["ebArg3"]:GetText(), dna.ui["ebArg4"]:GetText(), dna.ui["ebArg5"]:GetText() ) end,
 }
 tinsert( dna.D.criteriatree[UNIT_CRITERIA].children, { value='dna.CreateCriteriaPanel("d/unit/GetUnitAuraRefreshable")', text=L["d/unit/GetUnitAuraRefreshable"] } )
 ----------------------------------------------------------------------------------------------
@@ -814,7 +814,7 @@ dna.GetUnitHasBuffNameInList=function(unit, list)
 	local TreeLevel2=dna:SearchTable(dna.D.LTMC, "value", 'dna.CreateListPanel([=['..list..']=])')
 	for k,v in pairs(dna.D.LTMC[TreeLevel2].treeList) do
 		local _,_,spellID = strfind(v.value, '"(.*)","s"')
-		if ( spellID and dna.GetUnitHasBuffName( unit, spellID ) ) then
+		if ( spellID and dna.GetUnitHasBuffName( unit, spellID, 'HELPFUL' ) ) then
 			return true
 		end
 	end
@@ -918,7 +918,7 @@ dna.GetUnitHasDebuffNameInList=function(unit, list)
 	local TreeLevel2=dna:SearchTable(dna.D.LTMC, "value", 'dna.CreateListPanel([=['..list..']=])')
 	for k, v in pairs(dna.D.LTMC[TreeLevel2].treeList) do
 		local _,_,spellID = strfind(v.value, '"(.*)","s"')
-		if ( dna.GetUnitHasDebuffName( unit, spellID, '' ) ) then
+		if ( dna.GetUnitHasDebuffName( unit, spellID, 'HARMFUL' ) ) then
 			return true
 		end
 	end
@@ -1120,6 +1120,79 @@ dna.GetThreatUnitsInRangeOfItem=function(itemId,forcedCount)
 
 	local itemToCheck = itemId or 18904;
 
+	--LibRangeCheck-2.0
+	--
+	 -- [2] = {
+        -- 37727, -- Ruby Acorn
+    -- },
+    -- [3] = {
+        -- 42732, -- Everfrost Razor
+    -- },
+    -- [4] = {
+        -- 129055, -- Shoe Shine Kit
+    -- },
+    -- [5] = {
+        -- 8149, -- Voodoo Charm
+        -- 136605, -- Solendra's Compassion
+        -- 63427, -- Worgsaw
+    -- },
+    -- [7] = {
+        -- 61323, -- Ruby Seeds
+    -- },
+    -- [8] = {
+        -- 34368, -- Attuned Crystal Cores
+        -- 33278, -- Burning Torch
+    -- },
+    -- [10] = {
+        -- 32321, -- Sparrowhawk Net
+    -- },
+    -- [15] = {
+        -- 33069, -- Sturdy Rope
+    -- },
+    -- [20] = {
+        -- 10645, -- Gnomish Death Ray
+    -- },
+    -- [25] = {
+        -- 24268, -- Netherweave Net
+        -- 41509, -- Frostweave Net
+        -- 31463, -- Zezzak's Shard
+    -- },
+    -- [30] = {
+        -- 835, -- Large Rope Net
+        -- 7734, -- Six Demon Bag
+        -- 34191, -- Handful of Snowflakes
+    -- },
+    -- [35] = {
+        -- 24269, -- Heavy Netherweave Net
+        -- 18904, -- Zorbin's Ultra-Shrinker
+    -- },
+    -- [38] = {
+        -- 140786, -- Ley Spider Eggs
+    -- },
+    -- [40] = {
+        -- 28767, -- The Decapitator
+    -- },
+    -- [45] = {
+       --32698, -- Wrangling Rope
+        -- 23836, -- Goblin Rocket Launcher
+    -- },
+    -- [50] = {
+        -- 116139, -- Haunting Memento
+    -- },
+    -- [55] = {
+        -- 74637, -- Kiryn's Poison Vial
+    -- },
+    -- [60] = {
+        -- 32825, -- Soul Cannon
+        -- 37887, -- Seeds of Nature's Wrath
+    -- },
+    -- [70] = {
+        -- 41265, -- Eyesore Blaster
+    -- },
+    -- [80] = {
+        -- 35278, -- Reinforced Net
+    -- },
+
 	-- 5 man content, we count battleground also as small party
 	if dna.GetUnitIsMelee('player') then
 		-- 8 yards range
@@ -1168,12 +1241,15 @@ function dna.GetUnitsInThreat()
 			count = count + 1;
 			tinsert(units, unit);
 		else
-			local npcId = select(6, strsplit('-', UnitGUID(unit)));
-			npcId = tonumber(npcId);
-			-- Risen Soul, Tormented Soul, Lost Soul
-			if npcId == 148716 or npcId == 148893 or npcId == 148894 then
-				count = count + 1;
-				tinsert(units, unit);
+			local npcGUID = UnitGUID(unit)
+			if (npcGUID ~= nil) then
+				local npcId = select(6, strsplit('-', npcGUID));
+				npcId = tonumber(npcId);
+				-- Risen Soul, Tormented Soul, Lost Soul
+				if npcId == 148716 or npcId == 148893 or npcId == 148894 then
+					count = count + 1;
+					tinsert(units, unit);
+				end
 			end
 		end
 	end
@@ -1526,13 +1602,18 @@ tinsert( dna.D.criteriatree[ITEM_CRITERIA].children, { value='dna.CreateCriteria
 ----------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------
 dna.GetItemInRangeOfUnit=function(item, unit)
-	return IsItemInRange(item, unit)
+	dna.D.ResetDebugTimer()
+	local lReturn = false
+	lReturn = (IsItemInRange(item, unit) == 1)
+	dna.AppendActionDebug( 'GetItemInRangeOfUnit(item='..tostring(item)..',unit='..tostring(unit)..')='..tostring(lReturn) )
+    
+	return lReturn
 end
 dna.D.criteria["d/item/GetItemInRangeOfUnit"]={
 	a=2,
 	a1l=L["d/common/item/l"],a1dv="",a1tt=L["d/common/item/tt"],
 	a2l=L["d/common/un/l"],a2dv="target",a2tt=L["d/common/un/tt"],
-	f=function () return format('dna.GetItemInRangeOfUnit(%q,%q)', dna.ui["ebArg1"]:GetText(), dna.ui["ebArg2"]:GetText() ) end,
+	f=function () return format('dna.GetItemInRangeOfUnit(%s,%q)', dna.ui["ebArg1"]:GetText(), dna.ui["ebArg2"]:GetText() ) end,
 }
 tinsert( dna.D.criteriatree[ITEM_CRITERIA].children, { value='dna.CreateCriteriaPanel("d/item/GetItemInRangeOfUnit")', text=L["d/item/GetItemInRangeOfUnit"] } )
 end
@@ -2746,6 +2827,43 @@ dna.D.criteria["d/misc/SetWeakAuraInfo"]={
 	f=function () return format('dna:SetWeakAuraInfo(select(1,...),%q,%q)'.."\n", dna.ui["ebArg1"]:GetText(), dna.ui["ebArg2"]:GetText() ) end,
 }
 tinsert( dna.D.criteriatree[MISC_CRITERIA].children, { value='dna.CreateCriteriaPanel("d/misc/SetWeakAuraInfo")', text=L["d/misc/SetWeakAuraInfo"] } )
+----------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------
+dna.CastOnceOnRotationSelected=function(_,dnaActionFrame,keyBind,spellName)
+	dna.D.ResetDebugTimer()
+	local bReturn = true
+
+	
+	local sSpellID = dna.GetSpellID(spellName)
+	if ( sSpellID and dna.D.SpellInfo[sSpellID] and dna.D.SpellInfo[sSpellID].lastcastedtime ) then
+		if ( dna.D.SpellInfo[sSpellID].lastcastedtime > dna.last_rotation_switch_timestamp ) then
+			bReturn = false
+		end
+	end
+	
+	if ( bReturn == true ) then -- set weak aura info
+		if ( dnaActionFrame ) then
+			dnaActionFrame["_spellid"] = spellName
+		end
+		
+		if not keyBind then
+			dna.CurrentActionKeyBind = nil
+		elseif string.len(keyBind) == 1 then
+			dna.CurrentActionKeyBind = keyBind
+		end
+	end
+
+	dna.AppendActionDebug( 'CastOnceOnRotationSelected(keyBind='..tostring(keyBind)..',spellName='..tostring(spellName)..')='..tostring(bReturn))
+
+	return bReturn
+end
+dna.D.criteria["d/misc/CastOnceOnRotationSelected"]={
+	a=2,
+	a1l=L["d/misc/keybind/l"],a1dv=L["d/misc/keybind/dv"],a1tt=L["d/misc/keybind/tt"],
+	a2l=L["common/spellname/l"],a2dv=L["common/spellname/dv"],a2tt=L["common/spellname/tt"],
+	f=function () return format('dna:CastOnceOnRotationSelected(select(1,...),%q,%q)'.."\n", dna.ui["ebArg1"]:GetText(), dna.ui["ebArg2"]:GetText() ) end,
+}
+tinsert( dna.D.criteriatree[MISC_CRITERIA].children, { value='dna.CreateCriteriaPanel("d/misc/CastOnceOnRotationSelected")', text=L["d/misc/CastOnceOnRotationSelected"] } )
 
 --********************************************************************************************
 --GROUP CRITERIA

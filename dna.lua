@@ -284,15 +284,22 @@ function dna:OnEnable()
 		end
 
 		-- set the fsMeleeRange text
+		local meleeRangeText = ""
 		if ( dna.D.RTMC[dna.nSelectedRotationTableIndex]
 			and dna.IsBlank(dna.D.RTMC[dna.nSelectedRotationTableIndex].meleespell) == false
-			and dna.GetSpellInRangeOfUnit( dna.D.RTMC[dna.nSelectedRotationTableIndex].meleespell, "target") == false
 			and UnitExists("target")
 		) then
-			dna.fsMeleeRange:SetText("M") -- OOR show a M for melee
-		else
-			dna.fsMeleeRange:SetText("") -- In range for melee spell hide the M
+			-- User has input for spell to check
+			local spellInRange = dna.GetSpellInRangeOfUnit( dna.D.RTMC[dna.nSelectedRotationTableIndex].meleespell, "target")
+			local itemInRange = dna.GetItemInRangeOfUnit( dna.D.RTMC[dna.nSelectedRotationTableIndex].meleespell, "target")
+			
+			if ( spellInRange or itemInRange ) then
+				meleeRangeText = ""
+			else
+				meleeRangeText = "M"
+			end
 		end
+		dna.fsMeleeRange:SetText(meleeRangeText)
 		
 		-- set the fsRange text
 		if ( dna.D.RTMC[dna.nSelectedRotationTableIndex]
