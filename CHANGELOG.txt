@@ -1,12 +1,16 @@
-commit b9255793cf4fb1cbeba0970677a9d7cea9fc1a8e (HEAD -> main)
+commit 07ff068b1de78cfac8419711fef6df41abc0271f (HEAD -> main)
 Author: carboncope <>
-Date:   Fri Jan 29 09:38:26 2021 -0700
+Date:   Sat Mar 13 10:37:20 2021 -0700
 
-    1.0.23
-    Fixed refreshable parameter in dna.GetUnitAuraRefreshable
-    Added HELPFUL filter to dna.GetUnitHasBuffNameInList
-    Added HARMFUL filter to dna.GetUnitHasDebuffNameInList
-    Fixed dna.GetThreatUnitsInRangeOfItem counting for non-aggro units
-    Added debug output for dna.GetItemInRangeOfUnit
-    Added dna.CastOnceOnRotationSelected
-    Fixed a bug with rotation not working after exporting rotation
+    1.0.24
+    Added dna.GetUnitIsSafeToAttack
+    Added dna.GetGCDTime
+    Added dna.GetSpellUsableAfterCast
+    Added WasLastCast
+    Added Was2ndLastCast
+    Added Was3rdLastCast
+    Added dna.GetStarfireBuildsEclipse
+    Added dna.GetWrathBuildsEclipse
+    Added dna.GetStaggerPercent
+    Added FightDurationSec
+    Fixed List exporting / importing

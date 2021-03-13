@@ -70,6 +70,8 @@ function dna:OnEnable()
 
 	dna.D.Specs 		= {}																			--Specializations
 	dna.D.SpellInfo    = {}																				--Table to hold information about spells ex: ticktimes, traveltimes, base duration
+	dna.D.PlayerCastHistory   = {}																				--Table to hold player casted spell names
+	dna.D.PetCastHistory   = {}																				--Table to hold pet casted spell names
 
 	-- dna.D.tExternalFrames = {}																		--Table of external frames to find keybindings
     dna.D.tAsciiKeyBits   = {}																			--Table of ascii key bits
@@ -85,6 +87,8 @@ function dna:OnEnable()
 	dna.D.UpdateMode   = 0																				--0=create new names for existing objects do not update
 																										--1=update existing objects
 																										--3=Abort updates if objects already exist + do not create if object does not exist
+																										
+	dna.D.GCDTime = 1.5
 	dna.D.PClass = select(2, UnitClass("player") )
 
 	--Save the tree keys for short syntax lookup, we may chose to add more menus to the main tree later on

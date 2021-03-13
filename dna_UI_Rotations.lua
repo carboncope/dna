@@ -53,7 +53,7 @@ function dna.fGetRotationExport()
 	for nActionKey, tAction in pairs(tExport.data.children) do		
 		tAction.fCriteria = nil
 	end
-	strExport = dna.SerializeRotation(tExport)
+	strExport = dna.Serialize(tExport)
 	return strExport
 end
 
@@ -498,13 +498,14 @@ end
 
 function dna.ui.ddBindToSpecGetList()
 	dna.D.Specs = {}
-	for specID = 1, 3 do
+	for specID = 1, (GetNumSpecializations()+1) do
 		local id, name, description, icon, background, role = GetSpecializationInfo(specID)
-		if name then
+		if not dna.IsBlank(name) then
 			dna.D.Specs[specID] = name
+		else
+			dna.D.Specs[specID]=L["common/none"]
 		end
 	end
-	dna.D.Specs[4]=L["common/none"]
 
 	return dna.D.Specs
 end

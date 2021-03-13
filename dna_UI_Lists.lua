@@ -313,6 +313,7 @@ function dna.ui.tgListOnGroupSelected(self)
 	else
 		dna.D.RunCode( dna.ui.SelectedListEntryTable.value, '', "error pcall:", false, true  )
 
+
 		-- local func, errorMessage = loadstring(dna.ui.SelectedListEntryTable.value)	-- Use the .value field to create a function specific to the button
 		-- if( not func ) then	dna:dprint("Error: tgListOnGroupSelected loadingstring:"..dna.ui.SelectedListEntryTable.value.." Error:"..errorMessage) return end
 		-- local success, errorMessage = pcall(func);								-- Call the button specific function we loaded
@@ -343,6 +344,7 @@ function dna.ui.CreateListEntryPanel()
 		local targetListName = dna.ui.GetListNames()[self:GetValue()]
 		if (not dna.IsBlank(targetListName) and not dna.IsBlank(dna.ui.SelectedListEntryKey)) then
 			local strText = dna.D.LTMC[dna.ui.STL[2]].treeList[dna.ui.SelectedListEntryKey].text
+			dna:dprint('strText='..tostring(strText))
 			local entryType = dna.D.LTMC[dna.ui.STL[2]].treeList[dna.ui.SelectedListEntryKey].entryType
 			dna.AddListEntry(targetListName, true, strText, entryType )
 		end
@@ -366,10 +368,11 @@ end
 
 function dna.fGetListExport()
 	local tExport = {}
+	tExport.data = {}
 	tExport.strType = "list"
-	tExport.data = dna.D.LTMC[dna.ui.STL[2]]
+	tExport.data = dna:CopyTable( dna.D.LTMC[dna.ui.STL[2]] )
 	strExport = dna.Serialize(tExport)
-	return strExport
+	return strExport	
 end
 
 function dna.ui.bEntryDeleteOnClick() -- 12/28/2020

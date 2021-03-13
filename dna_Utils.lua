@@ -332,15 +332,7 @@ local function recurseStringify(data, level, lines)
   end
 end
 
-function dna.Serialize(data)
-  local lines = {"{"}
-  recurseStringify(data, 1, lines)
-  tinsert(lines, "}")
-  return table.concat(lines, "\n")
-end
-
-
-function dna.SerializeRotation(val, name)
+function dna.Serialize(val, name)
 	local tmp = ""
 
     if name then 
@@ -357,7 +349,7 @@ function dna.SerializeRotation(val, name)
         tmp = tmp .. "{"
 
         for k, v in pairs(val) do
-            tmp =  tmp .. dna.SerializeRotation(v, k) .. ","
+            tmp =  tmp .. dna.Serialize(v, k) .. ","
         end
 
         tmp = tmp .. "}"

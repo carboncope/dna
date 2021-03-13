@@ -55,8 +55,12 @@ function dna:UNIT_AURA(_,strUnitID)
 			-- staggerActive=dna.NilToNumeric( staggerActive )
 			-- print("staggerActive="..tostring(staggerActive))
 			-- staggerTotal=dna.NilToNumeric( staggerActive*(expirationTime-GetTime()) )
-			dna.D.P["STAGGER"].percent=dna.NilToNumeric( ( (dna.NilToNumeric( UnitStagger("player") ) /UnitHealthMax("player") ) * 100) )
-			dna.D.P["STAGGER"].total=dna.NilToNumeric( UnitStagger("player") )
+			
+			
+			-- dna.D.P["STAGGER"].percent=dna.NilToNumeric( ( (dna.NilToNumeric( UnitStagger("player") ) /UnitHealthMax("player") ) * 100) )
+			-- dna.D.P["STAGGER"].total=dna.NilToNumeric( UnitStagger("player") )
+			
+			
 			--print("total="..tostring(dna.D.P["STAGGER"].total))
 			--print("percent="..tostring(dna.D.P["STAGGER"].percent))
 		end
@@ -125,13 +129,19 @@ function dna:UNIT_SPELLCAST_CHANNEL_START(event, casterUnit, castGUID, spellID)
         end
     end
 end
+
 function dna:UNIT_SPELLCAST_SUCCEEDED(event, casterUnit, castGUID, spellID)
 	--https://wow.gamepedia.com/UNIT_SPELLCAST_SUCCEEDED
 	--https://wow.gamepedia.com/API_GetSpellInfo
+	if (dna.GetSpellCooldown(61304) < dna.D.GCDTime and dna.D.GCDTime == 1.5) then
+		dna.D.GCDTime = dna.GetSpellCooldown(61304)
+	end
+	
 	name, rank, icon, castTime, minRange, maxRange, spellId = GetSpellInfo(spellID)
-	if ( spellId and casterUnit == "player" ) then
+	spellName1, spellSubName1 = GetSpellBookItemName( spellId, BOOKTYPE_SPELL );
+	spellName2, spellSubName2 = GetSpellBookItemName( spellId, BOOKTYPE_PET  );
 
-		
+	if ( spellId and casterUnit == "player" ) then
 		if ( dna.GetSpellCastTime(spellId) == 0 ) then				-- Only update last casted time for instant or channeled spells
             if spellId ~= 6603 then
 				-- Before we update last casted spell, check if the spell changed from last time and reset the count to zero
@@ -141,6 +151,18 @@ function dna:UNIT_SPELLCAST_SUCCEEDED(event, casterUnit, castGUID, spellID)
 				else
 					dna.D.SpellInfo[tostring(spellId)].castcount = dna.D.SpellInfo[tostring(spellId)].castcount + 1
 				end
+
+				-- Before adding a spell to cast history, make sure we dont track more than 10 spells
+				if ( #dna.D.PlayerCastHistory > 9 ) then
+					table.remove(dna.D.PlayerCastHistory,1)
+				end
+				dna.D.PlayerCastHistory[#dna.D.PlayerCastHistory+1] = name
+				
+				
+				
+				--dna:doprint(GetTime().." dna.D.PlayerCastHistory-------------------")
+				--dna:rtprint(dna.D.PlayerCastHistory)
+				
                 dna.D.lastcastedspellid = spellId
             end
 			dna.SetSpellInfo( spellId, 'lastcastedtime', GetTime())

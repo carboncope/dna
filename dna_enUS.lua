@@ -364,6 +364,7 @@ L["d/player"]									= "Player"
 	L["d/player/GetPlayerDamageTaken"]			= "Player damage taken over last |cffF95C25<seconds>|r |cffF95C25<operator>|r |cffF95C25<number>|r"
 	L["d/player/GetPlayerEffectiveAttackPower"]	= "Player effective attack power is |cffF95C25<operator>|r |cffF95C25<number>|r"
 	L["d/player/GetPlayerGCD"]					= "Player GCD is |cffF95C25<operator>|r |cffF95C25<seconds>|r"	
+	L["d/player/GetGCDTime"]	= "The GCD time with haste is |cffF95C25<operator>|r |cffF95C25<seconds>|r"	
 	L["d/player/GetPlayerHasAutoAttackOn"]		= "Player has Auto Attack on"
 	L["d/player/GetPlayerHasGlyphSpellActive"]	= "Player has |cffF95C25<glyph spell>|r active"
 	L["d/player/GetPlayerIsAutoCastingSpell"]	= "Player is autocasting |cffF95C25<spell>|r"
@@ -411,8 +412,10 @@ L["d/unit"]										= "Unit"
 	L["d/unit/GetUnitHealth"]					= "|cffF95C25<unit>|r health is |cffF95C25<operator>|r |cffF95C25<number>|r"
 	L["d/unit/GetUnitHealthLost"]				= "|cffF95C25<unit>|r health lost is |cffF95C25<operator>|r |cffF95C25<number>|r"
 	L["d/unit/GetUnitHealthPercent"]			= "|cffF95C25<unit>|r health percent is |cffF95C25<operator>|r |cffF95C25<number>|r"
+	L["d/unit/GetUnitIsSafeToAttack"] = "|cffF95C25<unit>|r is safe to attack"
 	L["d/unit/GetThreatUnitsInRangeOfItem"] = "Get count of threat units in range of |cffF95C25<itemId> <forced count>|r |cffF95C25<operator>|r |cffF95C25<number>|r"
 	L["d/unit/GetUnitsInThreat"] = "Get count and table of units in threat |cffF95C25<operator>|r |cffF95C25<number>|r"
+	
     L["d/unit/GetUnitIsFriend"]					= "|cffF95C25<unit>|r is friends with |cffF95C25<otherunit>|r"
     L["d/unit/GetUnitIsEnemy"]					= "|cffF95C25<unit>|r is enemies with |cffF95C25<otherunit>|r"
     L["d/unit/GetUnitIsMoving"]					= "|cffF95C25<unit>|r is moving"
@@ -457,6 +460,8 @@ L["d/spell"]									= "Spell"
 	L["d/spell/GetSpellHaste"]					= "Get spell haste"
 	L["d/spell/GetSpellInRangeOfUnit"]			= "|cffF95C25<spell>|r is in range of |cffF95C25<unit>|r"
 	L["d/spell/GetSpellIsUsable"]				= "|cffF95C25<spell>|r is usable"
+	L["d/spell/GetSpellUsableAfterCast"]				=  "|cffF95C25<spell>|r |cffF95C25<powertype>|r usable after |cffF95C25<spellcast>|r |cffF95C25<powerchange>|r"
+	
 	L["d/spell/GetSpellLastCasted"]				= "|cffF95C25<spell>|r is my last casted spell"
 	L["d/spell/GetSpellLastCastedElapsed"]		= "|cffF95C25<spell>|r elapsed time from last casted is |cffF95C25<operator>|r |cffF95C25<seconds>|r"	
 	L["d/spell/GetSpellRechargeTimeRemaining"]	= "|cffF95C25<spell>|r recharge time remaining is |cffF95C25<operator>|r |cffF95C25<seconds>|r"
@@ -467,6 +472,10 @@ L["d/spell"]									= "Spell"
 	L["d/spell/SetSpellInfo"]					= "Set |cffF95C25<spell>|r |cffF95C25<attribute>|r |cffF95C25<value>|r"
 	L["d/spell/SetSpellTickTime"]				= "Set |cffF95C25<spell>|r |cffF95C25<ticktime>|r"
 	L["d/spell/SetSpellTravelTime"]				= "Set |cffF95C25<startspell>|r |cffF95C25<endspell>|r travel time"
+	L["d/spell/WasLastCast"] = "WasLastCast(|cffF95C25<spellname>)"
+	L["d/spell/Was2ndLastCast"] = "Was2ndLastCast(|cffF95C25<spellname>)"
+	L["d/spell/Was3rdLastCast"] = "Was3rdLastCast(|cffF95C25<spellname>)"
+	
 	
 --CLASS------------------------------------------------
 L["d/class"]									= "Class"
@@ -486,8 +495,9 @@ L["d/class"]									= "Class"
 	L["d/class/deathknight/GetTotalDepletedRunes"]	= "Total Depleted Runes |cffF95C25<operator>|r |cffF95C25<number>|r"
 	L["d/class/deathknight/GetTotalRuneCount"]	= "Total Rune Count |cffF95C25<operator>|r |cffF95C25<number>|r"	
 	--DRUID--------------------------------------------
-
-
+	L["d/class/druid/GetStarfireBuildsEclipse"]	= "Check if starfire will build eclipse"	
+	L["d/class/druid/GetWrathBuildsEclipse"]	= "Check if wrath will build eclipse"	
+	
 	--HUNTER-------------------------------------------
 	L["d/class/hunter/GetFocus"]				= "Focus is |cffF95C25<operator>|r |cffF95C25<number>|r"
 	--MAGE---------------------------------------------
@@ -545,6 +555,7 @@ L["d/talents"]														= "Talents"
 L["d/misc"]														= "Misc"
 	L["d/misc/an/l"]												= "Action Name:"
 	L["d/misc/an/tt"]											= "Enter the action name\nEx:|cffF95C25Fireball|r"
+	L["d/misc/FightDurationSec"]	=  "FightDurationSec"
 	L["d/misc/EnableLua"] = "Enable lua"
 	L["d/misc/GetActionCriteriaState"]					= "Get |cffF95C25<action name>|r criteria state"
 	L["d/misc/GetActionDisabled"]							= "|cffF95C25<action name>|r is disabled"

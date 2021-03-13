@@ -292,6 +292,21 @@ dna.D.criteria["d/player/GetPlayerEffectiveAttackPower"]={
 tinsert( dna.D.criteriatree[PLAYER_CRITERIA].children, { value='dna.CreateCriteriaPanel("d/player/GetPlayerEffectiveAttackPower")', text=L["d/player/GetPlayerEffectiveAttackPower"] } )
 ----------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------
+dna.GetGCDTime=function()
+	dna.D.ResetDebugTimer()
+	dna.AppendActionDebug( 'GetGCDTime()='..tostring(dna.D.GCDTime) )
+	return dna.D.GCDTime
+end
+dna.D.criteria["d/player/GetGCDTime"]={
+	a=2,
+	a1l=L["d/common/co/l"],a1dv="<",a1tt=L["d/common/co/tt"],
+	a2l=L["d/common/seconds/l"],a2dv="60",a2tt=L["d/common/seconds/tt"],
+	f=function () return format('dna.GetGCDTime()%s%s', dna.ui["ebArg1"]:GetText(), dna.ui["ebArg2"]:GetText() ) end,
+}
+tinsert( dna.D.criteriatree[PLAYER_CRITERIA].children, { value='dna.CreateCriteriaPanel("d/player/GetGCDTime")', text=L["d/player/GetGCDTime"] } )
+
+----------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------
 dna.GetPlayerGCD=function()
 	dna.D.ResetDebugTimer()
 	local GCD = dna.GetSpellCooldown(61304)
@@ -1266,6 +1281,32 @@ dna.D.criteria["d/unit/GetUnitsInThreat"]={
 tinsert( dna.D.criteriatree[UNIT_CRITERIA].children, { value='dna.CreateCriteriaPanel("d/unit/GetUnitsInThreat")', text=L["d/unit/GetUnitsInThreat"] } )
 ----------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------
+function dna.GetUnitIsSafeToAttack(unit)
+	dna.D.ResetDebugTimer()
+	local lReturn = true
+	
+	--TODO Add CC buff checks
+	local lowername = strtrim(strlower(tostring(UnitName(unit))))
+	local dummy = string.match(lowername, "dummy")
+		or string.match(lowername, "essence orb") 
+		or string.match(lowername, "shattered visage") 
+	if ( UnitIsFriend('player',unit) ) then
+		lReturn = false
+	elseif ( not UnitAffectingCombat(unit) and not dummy ) then
+		lReturn = false
+	end
+
+	dna.AppendActionDebug( 'GetUnitIsSafeToAttack(unit='..tostring(unit)..')='..tostring(lReturn) )
+	return lReturn
+end
+dna.D.criteria["d/unit/GetUnitIsSafeToAttack"]={
+	a=1,
+	a1l=L["d/common/un/l"],a1dv="target",a1tt=L["d/common/un/tt"],
+	f=function () return format('dna.GetUnitIsSafeToAttack(%q)', dna.ui["ebArg1"]:GetText() ) end,
+}
+tinsert( dna.D.criteriatree[UNIT_CRITERIA].children, { value='dna.CreateCriteriaPanel("d/unit/GetUnitIsSafeToAttack")', text=L["d/unit/GetUnitIsSafeToAttack"] } )
+----------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------
 dna.GetUnitIsFriend=function(unit, otherunit)
 	dna.D.ResetDebugTimer()
 	local lReturn = False
@@ -1299,9 +1340,12 @@ tinsert( dna.D.criteriatree[UNIT_CRITERIA].children, { value='dna.CreateCriteria
 ----------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------
 dna.GetUnitIsMoving=function(unit)
+	dna.D.ResetDebugTimer()
 	local lReturn = 0
-
-	return (GetUnitSpeed(unit) > 0)
+	lReturn = (GetUnitSpeed(unit) > 0)
+	
+	dna.AppendActionDebug( 'GetUnitIsMoving(unit='..tostring(unit)..')='..tostring(lReturn) )
+	return lReturn
 end
 dna.D.criteria["d/unit/GetUnitIsMoving"]={
 	a=1,
@@ -2149,6 +2193,39 @@ dna.D.criteria["d/spell/GetSpellInRangeOfUnit"]={
 tinsert( dna.D.criteriatree[SPELL_CRITERIA].children, { value='dna.CreateCriteriaPanel("d/spell/GetSpellInRangeOfUnit")', text=L["d/spell/GetSpellInRangeOfUnit"] } )
 ----------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------
+dna.GetSpellUsableAfterCast=function(spelltocheck, powertype, castingspellcheck, castingpoweradded)
+	dna.D.ResetDebugTimer()
+	local lReturn = false
+	local power = dna.NilToNumeric(UnitPower('player', Enum.PowerType[powertype], false))
+	local cost = 0
+	local costTable = GetSpellPowerCost(spelltocheck);
+    for _, costInfo in pairs(costTable) do
+      if costInfo.type == Enum.PowerType[powertype] then
+        cost = costInfo.cost;		
+      end
+    end
+	
+	-- Check if we are casting the spell castingspellcheck and if will generate enough power to meet cost
+	if ( dna.GetUnitCastingSpell('player', castingspellcheck) ) then
+		if ( (power + castingpoweradded) >= cost ) then
+			lReturn = true
+		end
+	end
+	
+	dna.AppendActionDebug( 'GetSpellUsableAfterCast(spelltocheck='..tostring(spelltocheck)..',powertype='..tostring(powertype)..',castingspellcheck='..tostring(castingspellcheck)..',castingpoweradded='..tostring(castingpoweradded)..')='..tostring(lReturn) )
+	return lReturn
+end
+dna.D.criteria["d/spell/GetSpellUsableAfterCast"]={
+	a=4,
+	a1l=L["d/common/sp/l"],a1dv=L["d/common/sp/dv"],a1tt=L["d/common/sp/tt"],
+	a2l=L["d/common/power/l"],a2dv="LunarPower",a2tt=L["d/common/power/tt"],
+	a3l=L["d/common/sp/l"],a3dv=L["d/common/sp/dv"],a3tt=L["d/common/sp/tt"],
+	a4l=L["d/common/number/l"],a4dv=L["d/common/number/dv"],a4tt=L["d/common/number/tt"],
+	f=function () return format('dna.GetSpellUsableAfterCast(%q,%q,%q,%s)', dna.ui["ebArg1"]:GetText(), dna.ui["ebArg2"]:GetText(), dna.ui["ebArg3"]:GetText(), dna.ui["ebArg4"]:GetText()) end,
+}
+tinsert( dna.D.criteriatree[SPELL_CRITERIA].children, { value='dna.CreateCriteriaPanel("d/spell/GetSpellUsableAfterCast")', text=L["d/spell/GetSpellUsableAfterCast"] } )
+----------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------
 dna.GetSpellIsUsable=function(spell)
 	dna.D.ResetDebugTimer()
 	local lReturn = false
@@ -2277,6 +2354,60 @@ dna.D.criteria["d/spell/SetSpellInfo"]={
 	f=function () return format('dna.SetSpellInfo(%q,%q,%s)', dna.ui["ebArg1"]:GetText(), dna.ui["ebArg2"]:GetText(), dna.ui["ebArg3"]:GetText() ) end,
 }
 tinsert( dna.D.criteriatree[SPELL_CRITERIA].children, { value='dna.CreateCriteriaPanel("d/spell/SetSpellInfo")', text=L["d/spell/SetSpellInfo"] } )
+----------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------
+WasLastCast=function(spellname)
+	dna.D.ResetDebugTimer()
+	local lReturn = false
+	
+	if ( dna.D.PlayerCastHistory[#dna.D.PlayerCastHistory] == dna.GetSpellName( spellname ) ) then
+		lReturn = true
+	end
+	dna.AppendActionDebug( 'WasLastCast(spellname='..tostring(spellname)..')='..tostring(lReturn)..', LastCast='..tostring( dna.D.PlayerCastHistory[#dna.D.PlayerCastHistory] ) )
+	return lReturn
+end
+dna.D.criteria["d/spell/WasLastCast"]={
+	a=1,
+	a1l=L["d/common/sp/l"],a1dv=L["d/common/sp/dv"],a1tt=L["d/common/sp/tt"],
+	f=function () return format('WasLastCast(%q)', dna.ui["ebArg1"]:GetText()) end,
+}
+tinsert( dna.D.criteriatree[SPELL_CRITERIA].children, { value='dna.CreateCriteriaPanel("d/spell/WasLastCast")', text=L["d/spell/WasLastCast"] } )
+----------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------
+Was2ndLastCast=function(spellname)
+	dna.D.ResetDebugTimer()
+	local lReturn = false
+	
+	if ( dna.D.PlayerCastHistory[#dna.D.PlayerCastHistory-1] == dna.GetSpellName( spellname ) ) then
+		lReturn = true
+	end
+	dna.AppendActionDebug( 'Was2ndLastCast(spellname='..tostring(spellname)..')='..tostring(lReturn)..', 2ndLastCast='..tostring( dna.D.PlayerCastHistory[#dna.D.PlayerCastHistory-1] ) )
+	return lReturn
+end
+dna.D.criteria["d/spell/Was2ndLastCast"]={
+	a=1,
+	a1l=L["d/common/sp/l"],a1dv=L["d/common/sp/dv"],a1tt=L["d/common/sp/tt"],
+	f=function () return format('Was2ndLastCast(%q)', dna.ui["ebArg1"]:GetText()) end,
+}
+tinsert( dna.D.criteriatree[SPELL_CRITERIA].children, { value='dna.CreateCriteriaPanel("d/spell/Was2ndLastCast")', text=L["d/spell/Was2ndLastCast"] } )
+----------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------
+Was3rdLastCast=function(spellname)
+	dna.D.ResetDebugTimer()
+	local lReturn = false
+	
+	if ( dna.D.PlayerCastHistory[#dna.D.PlayerCastHistory-2] == dna.GetSpellName( spellname ) ) then
+		lReturn = true
+	end
+	dna.AppendActionDebug( 'Was3rdLastCast(spellname='..tostring(spellname)..')='..tostring(lReturn)..', 3rdLastCast='..tostring( dna.D.PlayerCastHistory[#dna.D.PlayerCastHistory-2] ) )
+	return lReturn
+end
+dna.D.criteria["d/spell/Was3rdLastCast"]={
+	a=1,
+	a1l=L["d/common/sp/l"],a1dv=L["d/common/sp/dv"],a1tt=L["d/common/sp/tt"],
+	f=function () return format('Was3rdLastCast(%q)', dna.ui["ebArg1"]:GetText()) end,
+}
+tinsert( dna.D.criteriatree[SPELL_CRITERIA].children, { value='dna.CreateCriteriaPanel("d/spell/Was3rdLastCast")', text=L["d/spell/Was3rdLastCast"] } )
 
 --********************************************************************************************
 --CLASS CRITERIA
@@ -2391,7 +2522,57 @@ dna.D.InitCriteriaClassTree=function()
 		--------------------------------------------------------------------------------------
 		tinsert( dna.D.criteriatree[CLASS_CRITERIA].children, { value='dna.CreateCriteriaPanel("d/class/common/GetEnergyTimeToMax")', text=L["d/class/common/GetEnergyTimeToMax"] } )
 		--------------------------------------------------------------------------------------
+		dna.GetStarfireBuildsEclipse=function()
+			dna.D.ResetDebugTimer()
 
+			local wrath = 190984
+			local starfire  = 194153
+			local wrathCount = GetSpellCount(wrath);
+			local starfireCount = GetSpellCount(starfire);
+			local lReturn = false
+			
+			local eclipseLunarNext = wrathCount <= 0 and starfireCount > 0;
+			local eclipseAnyNext = wrathCount > 0 and starfireCount > 0;
+	
+			if (eclipseLunarNext or eclipseAnyNext) then
+				lReturn = true
+			end
+
+			dna.AppendActionDebug( 'GetStarfireBuildsEclipse()='..tostring(lReturn) )
+			return lReturn
+		end
+		dna.D.criteria["d/class/druid/GetStarfireBuildsEclipse"]={
+			a=0,
+			f=function () return format('dna.GetStarfireBuildsEclipse()') end,
+		}
+		tinsert( dna.D.criteriatree[CLASS_CRITERIA].children, { value='dna.CreateCriteriaPanel("d/class/druid/GetStarfireBuildsEclipse")', text=L["d/class/druid/GetStarfireBuildsEclipse"] } )
+		--------------------------------------------------------------------------------------
+		dna.GetWrathBuildsEclipse=function()
+			dna.D.ResetDebugTimer()
+
+			local wrath = 190984
+			local starfire  = 194153
+			local wrathCount = GetSpellCount(wrath);
+			local starfireCount = GetSpellCount(starfire);
+			local lReturn = false
+			
+			local eclipseSolarNext = wrathCount > 0 and starfireCount <= 0;
+			local eclipseAnyNext = wrathCount > 0 and starfireCount > 0;
+	
+			if (eclipseSolarNext or eclipseAnyNext) then
+				lReturn = true
+			end
+
+			dna.AppendActionDebug( 'GetWrathBuildsEclipse()='..tostring(lReturn) )
+			return lReturn
+		end
+		dna.D.criteria["d/class/druid/GetWrathBuildsEclipse"]={
+			a=0,
+			f=function () return format('dna.GetWrathBuildsEclipse()') end,
+		}
+		tinsert( dna.D.criteriatree[CLASS_CRITERIA].children, { value='dna.CreateCriteriaPanel("d/class/druid/GetWrathBuildsEclipse")', text=L["d/class/druid/GetWrathBuildsEclipse"] } )		
+		--------------------------------------------------------------------------------------
+	
     ----------------------------------------------------
     -- HUNTER
     ----------------------------------------------------
@@ -2406,20 +2587,25 @@ dna.D.InitCriteriaClassTree=function()
 		--------------------------------------------------------------------------------------
 
 		--------------------------------------------------------------------------------------
+		dna.GetStaggerPercent=function()
+			dna.D.ResetDebugTimer()
+
+			local lReturn = 0
+			local healthMax = UnitHealthMax('player')
+			local staggerAmount = UnitStagger('player')
+			local lReturn = (staggerAmount / healthMax) * 100
+			
+			dna.AppendActionDebug( 'GetStaggerPercent()='..tostring(lReturn) )
+			return lReturn
+		end
 		dna.D.criteria["d/class/monk/GetStaggerPercent"]={
 			a=2,
 			a1l=L["d/common/co/l"],a1dv=">",a1tt=L["d/common/co/tt"],
 			a2l=L["d/class/monk/staggerpercent/l"],a2dv=L["d/class/monk/staggerpercent/dv"],a2tt=L["d/class/monk/staggerpercent/tt"],
-			f=function () return format('dna.D.P["STAGGER"].percent%s%s', dna.ui["ebArg1"]:GetText(), dna.ui["ebArg2"]:GetText()) end,
+			f=function () return format('dna.GetStaggerPercent()%s%s', dna.ui["ebArg1"]:GetText(), dna.ui["ebArg2"]:GetText()) end,
 		}
 		tinsert( dna.D.criteriatree[CLASS_CRITERIA].children, { value='dna.CreateCriteriaPanel("d/class/monk/GetStaggerPercent")', text=L["d/class/monk/GetStaggerPercent"] } )
-		dna.D.criteria["d/class/monk/GetStaggerTotal"]={
-			a=2,
-			a1l=L["d/common/co/l"],a1dv=">",a1tt=L["d/common/co/tt"],
-			a2l=L["d/class/monk/stagger/l"],a2dv=L["d/class/monk/stagger/dv"],a2tt=L["d/class/monk/stagger/tt"],
-			f=function () return format('dna.D.P["STAGGER"].total%s%s', dna.ui["ebArg1"]:GetText(), dna.ui["ebArg2"]:GetText()) end,
-		}
-		tinsert( dna.D.criteriatree[CLASS_CRITERIA].children, { value='dna.CreateCriteriaPanel("d/class/monk/GetStaggerTotal")', text=L["d/class/monk/GetStaggerTotal"] } )
+		
 	elseif (dna.D.PClass == "PALADIN") then---------------------------------------------------------------------------------
 		--------------------------------------------------------------------------------------
 		dna.GetTimeToGainHolyPower=function()
@@ -2636,6 +2822,23 @@ dna.D.criteria["d/misc/EnableLua"]={
 	f=function () return format('--_dna_enable_lua') end
 }
 tinsert( dna.D.criteriatree[MISC_CRITERIA].children, { value='dna.CreateCriteriaPanel("d/misc/EnableLua")', text=L["d/misc/EnableLua"] } )
+----------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------
+FightDurationSec=function()
+	dna.D.ResetDebugTimer()
+	local lReturn = 0
+	if ( dna.D.P.EnteredCombatTime and dna.D.P.EnteredCombatTime > 0) then
+		lReturn = (GetTime() - dna.D.P.EnteredCombatTime)
+	end
+	dna.AppendActionDebug( 'FightDurationSec()='..tostring(lReturn) )
+
+	return lReturn
+end
+dna.D.criteria["d/misc/FightDurationSec"]={
+	a=0,
+	f=function () return format('FightDurationSec()') end,
+}
+tinsert( dna.D.criteriatree[MISC_CRITERIA].children, { value='dna.CreateCriteriaPanel("d/misc/FightDurationSec")', text=L["d/misc/FightDurationSec"] } )
 ----------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------
 dna.GetActionCriteriaState=function(actionName)
@@ -2941,8 +3144,8 @@ dna.GetNumHurtPlayers=function( minpercent, distIndex )
 		group, num = "raid", GetNumGroupMembers()
 	elseif IsInGroup() then
 		group, num = "party", GetNumSubgroupMembers()
-	elseif ( (100 - dna.GetUnitHealthPercent("player")) > 0 ) then
-		return 1
+	elseif ( (100 - dna.GetUnitHealthPercent("player")) > minpercent ) then
+		lHurtCount = 1
 	end
 	if ( group ) then
 		for i = 1, num do
