@@ -79,6 +79,10 @@ function dna:UNIT_AURA(_,strUnitID)
 end
 
 function dna:UNIT_SPELLCAST_START(event, casterUnit, castGUID, spellID)
+	if (dna.GetSpellCooldown(61304) ~= dna.D.GCDTime ) then
+		dna.D.GCDTime = dna.GetSpellCooldown(61304)
+	end
+
 	name, rank, icon, castTime, minRange, maxRange, spellId = GetSpellInfo(spellID)
 	if ( spellId and casterUnit == "player" ) then
         -- if spellId ~= 6603 then -- Changed 1/2/2021 because only successful casts should be counted in UNIT_SPELLCAST_SUCCEEDED
@@ -133,9 +137,6 @@ end
 function dna:UNIT_SPELLCAST_SUCCEEDED(event, casterUnit, castGUID, spellID)
 	--https://wow.gamepedia.com/UNIT_SPELLCAST_SUCCEEDED
 	--https://wow.gamepedia.com/API_GetSpellInfo
-	if (dna.GetSpellCooldown(61304) < dna.D.GCDTime and dna.D.GCDTime == 1.5) then
-		dna.D.GCDTime = dna.GetSpellCooldown(61304)
-	end
 	
 	name, rank, icon, castTime, minRange, maxRange, spellId = GetSpellInfo(spellID)
 	spellName1, spellSubName1 = GetSpellBookItemName( spellId, BOOKTYPE_SPELL );

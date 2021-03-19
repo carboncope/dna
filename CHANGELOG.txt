@@ -1,16 +1,6 @@
-commit 07ff068b1de78cfac8419711fef6df41abc0271f (HEAD -> main)
+commit a0ed5ddb4e44627103e382936efa097bf6bcc9ce (HEAD -> main)
 Author: carboncope <>
-Date:   Sat Mar 13 10:37:20 2021 -0700
+Date:   Thu Mar 18 22:28:41 2021 -0600
 
-    1.0.24
-    Added dna.GetUnitIsSafeToAttack
-    Added dna.GetGCDTime
-    Added dna.GetSpellUsableAfterCast
-    Added WasLastCast
-    Added Was2ndLastCast
-    Added Was3rdLastCast
-    Added dna.GetStarfireBuildsEclipse
-    Added dna.GetWrathBuildsEclipse
-    Added dna.GetStaggerPercent
-    Added FightDurationSec
-    Fixed List exporting / importing
+    1.0.25
+    Fixed bugs with deleting a list entry, you may have to delete a list and recreate it to fix bugged lists

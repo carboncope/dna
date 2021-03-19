@@ -296,13 +296,20 @@ function dna.CreateListPanel(ListName)
 end
 --List Panel Callbacks-----------------------------
 function dna.ui.tgListOnGroupSelected(self)
+	-- Called when you click on a spell entry in a list tree group
 	self:RefreshTree()														--Refresh the tree so .selected gets updated
 	dna.ui.sgMain.tgMain.sgPanel.tgList.sgEntryPanel:ReleaseChildren()		--Clears the right panel in the list Entry tree
 	dna.ui.SelectedListEntryKey=nil										--Save the selected list entry for global scope
 	dna.ui.SelectedListEntryTable=nil
+	dna.ui.SelectedListEntryValue=nil
 	for k,v in pairs(self.buttons) do
 		if ( v.selected ) then
 			if ( dna:SearchTable( dna.D.LTMC[dna.ui.STL[2]].treeList, "value", v.value ) ) then
+				-- We need the text of the selected list entry, but the only way to get it is parse it out
+				local startIndex = string.find (v.value, '"')
+				local endIndex = string.find (v.value, '"', startIndex+1)
+				local entryText = string.sub(tostring(v.value), startIndex+1, endIndex-1)
+				dna.ui.SelectedListEntryText = entryText -- dna.ui.CreateListEntryPanel("Burning Strain"
 				dna.ui.SelectedListEntryKey = k
 				dna.ui.SelectedListEntryTable = v
 			end
@@ -378,10 +385,31 @@ end
 function dna.ui.bEntryDeleteOnClick() -- 12/28/2020
 	if ( dna.IsBlank(dna.ui.SelectedListEntryKey) ) then return end
 	local strSelectedList = dna.D.LTMC[dna.ui.STL[2]].value
-	local entryText = dna.D.LTMC[dna.ui.STL[2]].treeList[dna.ui.SelectedListEntryKey].text
+	local selectedTreeIndex = 0
+	
+	for i=1,#dna.D.LTMC[dna.ui.STL[2]].treeList do
+		local treeEntry = dna.D.LTMC[dna.ui.STL[2]].treeList[i].text
+		if (dna.ui.SelectedListEntryText == treeEntry) then
+			selectedTreeIndex = i
+			break
+		end
+		
+		if (dna.GetSpellName(dna.ui.SelectedListEntryText)== treeEntry) then
+			selectedTreeIndex = i
+			break
+		end
+		
+		if (dna.GetItemName(dna.ui.SelectedListEntryText)== treeEntry) then
+			selectedTreeIndex = i
+			break
+		end
+	end
+	if (selectedTreeIndex > 0) then	
+		tremove(dna.D.LTMC[dna.ui.STL[2]].treeList, selectedTreeIndex)
+		dna.D.LTMC[dna.ui.STL[2]].entries[dna.ui.SelectedListEntryText] = nil
+		dna.ui.SelectedListEntryText = nil
+	end
 
-	tremove(dna.D.LTMC[dna.ui.STL[2]].treeList, dna.ui.SelectedListEntryKey)
-    dna.D.LTMC[dna.ui.STL[2]].entries[entryText] = nil
 	dna.ui.sgMain.tgMain:SelectByValue(dna.D.LTM.value.."\001"..strSelectedList) -- Click back on main list: Require the user to click another spell and update dna.ui.SelectedListEntryKey
 end
 function dna.ui.ebRenameListOnEnterPressed(...)
