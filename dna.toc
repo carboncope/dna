@@ -2,7 +2,7 @@
 ## Title: dna
 ## Notes: Rotation manager addon
 ## Author: carboncope
-## Version: 1.0.25
+## Version: 1.0.26
 ## SavedVariables: dna_ace_db
 
 embeds.xml

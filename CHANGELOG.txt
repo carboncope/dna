@@ -1,6 +1,6 @@
-commit a0ed5ddb4e44627103e382936efa097bf6bcc9ce (HEAD -> main)
+commit 2871e980ba1b4a551c9e8da506d1fee38c662c83 (HEAD -> main)
 Author: carboncope <>
-Date:   Thu Mar 18 22:28:41 2021 -0600
+Date:   Sat Apr 17 09:02:15 2021 -0600
 
-    1.0.25
-    Fixed bugs with deleting a list entry, you may have to delete a list and recreate it to fix bugged lists
+    1.0.26
+    Added player/GetPlayerDamageTakenInLast5Seconds

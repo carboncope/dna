@@ -10,6 +10,7 @@ local TableInsert = tinsert;
 local TableRemove = tremove;
 local TableContains = tContains;
 local TableIndexOf = tIndexOf;
+local CombatLogGetCurrentEventInfo = CombatLogGetCurrentEventInfo
 
 function dna:OnCommReceived(prefix, message, distribution, sender)
     print('dna Comm Received')
@@ -187,6 +188,50 @@ end
 
 function self:ACTIVE_TALENT_GROUP_CHANGED()
 	self:SetRotationForCurrentSpec()
+end
+
+function dna:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
+	local timestamp, subevent, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, _, _, _, extraArg1, extraArg2, extraArg3, extraArg4, extraArg5, extraArg6, extraArg7, extraArg8, extraArg9, extraArg10 = CombatLogGetCurrentEventInfo()
+	local amount
+		
+	-- Only destination player below here
+	local amount
+
+	if (destGUID == UnitGUID("player") and strfind(subevent, "DAMAGE")) then
+		-- dna:doprint("COMBAT_LOG_EVENT_UNFILTERED subevent="..tostring(subevent))
+		-- dna:doprint("    extraArg1="..tostring(extraArg1))
+		-- dna:doprint("    extraArg2="..tostring(extraArg2))
+		-- dna:doprint("    extraArg3="..tostring(extraArg3))
+		-- dna:doprint("    extraArg4="..tostring(extraArg4))
+	
+		if subevent == "SPELL_DAMAGE" or subevent == "SPELL_PERIODIC_DAMAGE" or subevent == "RANGE_DAMAGE" then
+			amount = extraArg4
+		elseif subevent == "SWING_DAMAGE" then
+			amount = extraArg1
+		elseif subevent == "ENVIRONMENTAL_DAMAGE" then
+			amount = extraArg2
+		end
+		if (amount) then
+			-- Record new damage at the top of the log:
+			tinsert(dna.D.damageAmounts, 1, amount)
+			tinsert(dna.D.damageTimestamps, 1, timestamp)
+		end
+	end
+	
+	-- Clear out old entries from the bottom, and add up the remaining ones:
+	local cutoff = timestamp - 5
+	damageInLast5Seconds = 0
+	for i = #dna.D.damageTimestamps, 1, -1 do
+		local timestamp = dna.D.damageTimestamps[i]
+		if timestamp < cutoff then
+			dna.D.damageTimestamps[i] = nil
+			dna.D.damageAmounts[i] = nil
+		else
+			damageInLast5Seconds = damageInLast5Seconds + dna.D.damageAmounts[i]
+		end
+	end
+	dna.D.damageInLast5Seconds = damageInLast5Seconds
+	--dna:dprint("  dna.D.damageInLast5Seconds="..tostring(dna.D.damageInLast5Seconds))
 end
 
 function dna:PLAYER_ENTERING_WORLD()

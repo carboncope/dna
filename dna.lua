@@ -84,7 +84,11 @@ function dna:OnEnable()
 	dna.D.DebugTimerStart		= debugprofilestop()													--Initialize debug timer
 	-- dna.D.nLastSpecSwitchTime	= 0
 
-	dna.D.UpdateMode   = 0																				--0=create new names for existing objects do not update
+	dna.D.damageInLast5Seconds = 0
+	dna.D.damageAmounts = {}
+	dna.D.damageTimestamps = {}
+
+	dna.D.UpdateMode   = 0																	--0=create new names for existing objects do not update
 																										--1=update existing objects
 																										--3=Abort updates if objects already exist + do not create if object does not exist
 																										
@@ -396,6 +400,7 @@ function dna:OnEnable()
 	dna:RegisterEvent("UNIT_SPELLCAST_CHANNEL_START", "UNIT_SPELLCAST_START")
 	dna:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED", "UNIT_SPELLCAST_SUCCEEDED")
 	dna:RegisterEvent("ACTIVE_TALENT_GROUP_CHANGED", "ACTIVE_TALENT_GROUP_CHANGED")
+	dna:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED", "COMBAT_LOG_EVENT_UNFILTERED")
 	dna:RegisterEvent("PLAYER_REGEN_ENABLED", "PLAYER_REGEN_ENABLED")
 	dna:RegisterEvent("PLAYER_REGEN_DISABLED", "PLAYER_REGEN_DISABLED")
 	dna:RegisterEvent("NAME_PLATE_UNIT_ADDED", "NAME_PLATE_UNIT_ADDED");

@@ -278,6 +278,23 @@ dna.D.criteria["d/player/GetPlayerCombatTime"]={
 tinsert( dna.D.criteriatree[PLAYER_CRITERIA].children, { value='dna.CreateCriteriaPanel("d/player/GetPlayerCombatTime")', text=L["d/player/GetPlayerCombatTime"] } )
 ----------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------
+dna.GetPlayerDamageTakenInLast5Seconds=function()
+	dna.D.ResetDebugTimer()
+	local lReturn = 0
+	lReturn = dna.D.damageInLast5Seconds
+
+	dna.AppendActionDebug( 'GetPlayerDamageTakenInLast5Seconds()='..tostring(lReturn) )
+	return lReturn
+end
+dna.D.criteria["d/player/GetPlayerDamageTakenInLast5Seconds"]={
+	a=2,
+	a1l=L["d/common/co/l"],a1dv=">",a1tt=L["d/common/co/tt"],
+	a2l=L["d/common/number/l"],a2dv="2800",a2tt=L["d/common/number/tt"],
+	f=function () return format('dna.GetPlayerDamageTakenInLast5Seconds()%s%s', dna.ui["ebArg1"]:GetText(), dna.ui["ebArg2"]:GetText() ) end,
+}
+tinsert( dna.D.criteriatree[PLAYER_CRITERIA].children, { value='dna.CreateCriteriaPanel("d/player/GetPlayerDamageTakenInLast5Seconds")', text=L["d/player/GetPlayerDamageTakenInLast5Seconds"] } )
+----------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------
 dna.GetPlayerEffectiveAttackPower=function()
 	local base, posBuff, negBuff = UnitAttackPower("player");
 	local effective = base + posBuff + negBuff;
