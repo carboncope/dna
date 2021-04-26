@@ -295,6 +295,24 @@ dna.D.criteria["d/player/GetPlayerDamageTakenInLast5Seconds"]={
 tinsert( dna.D.criteriatree[PLAYER_CRITERIA].children, { value='dna.CreateCriteriaPanel("d/player/GetPlayerDamageTakenInLast5Seconds")', text=L["d/player/GetPlayerDamageTakenInLast5Seconds"] } )
 ----------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------
+HasBuff=function(aura)
+	dna.D.ResetDebugTimer()
+	local lReturn = false
+	local lName = dna:GetUnitAura("player", dna.GetSpellName(aura), "PLAYER|HELPFUL")
+	if lName then
+		lReturn = true
+	end
+	dna.AppendActionDebug( 'HasBuff(aura='..tostring(aura)..')='..tostring(lReturn) )
+	return lReturn
+end
+dna.D.criteria["d/player/HasBuff"]={
+	a=1,
+	a1l=L["d/common/aura/l"],a1dv=L["d/common/aura/dv"],a1tt=L["d/common/aura/tt"],
+	f=function () return format('HasBuff(%q)', dna.ui["ebArg1"]:GetText()) end,
+}
+tinsert( dna.D.criteriatree[PLAYER_CRITERIA].children, { value='dna.CreateCriteriaPanel("d/player/HasBuff")', text=L["d/player/HasBuff"] } )
+----------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------
 dna.GetPlayerEffectiveAttackPower=function()
 	local base, posBuff, negBuff = UnitAttackPower("player");
 	local effective = base + posBuff + negBuff;
@@ -777,6 +795,33 @@ dna.GetUnitGUIDIsGroupMember=function(unitGUID)
 	end
 	return false
 end
+----------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------
+dna.GetUnitHasAuraType=function(unit, atype, filter)
+	dna.D.ResetDebugTimer()
+	local lReturn = false
+	local id = 1
+	while( true ) do
+		local name, _, _, auraType = UnitAura(unit, id, filter)
+		
+		if( not name ) then break end
+		if string.upper(auraType) == string.upper(atype) and not dna.D.DebuffExclusions[name] then
+			lReturn =  true
+			break
+		end
+		id = id + 1
+	end
+	dna.AppendActionDebug( 'GetUnitHasAuraType(unit='..tostring(unit)..",auratype="..tostring(atype)..",filter="..tostring(filter)..')='..tostring(lReturn) )
+	return lReturn
+end
+dna.D.criteria["d/unit/GetUnitHasAuraType"]={
+	a=3,
+	a1l=L["d/common/un/l"],a1dv="target",a1tt=L["d/common/un/tt"],
+	a2l=L["d/common/auratype/l"],a2dv=L["d/common/auratype/dv"],a2tt=L["d/common/auratype/tt"],
+	a3l=L["d/common/aurafilter/l"],a3dv="HELFPUL",a3tt=L["d/common/aurafilter/tt"],
+	f=function () return format('dna.GetUnitHasAuraType(%q,%q)', dna.ui["ebArg1"]:GetText(), dna.ui["ebArg2"]:GetText()) end,
+}
+tinsert( dna.D.criteriatree[UNIT_CRITERIA].children, { value='dna.CreateCriteriaPanel("d/unit/GetUnitHasAuraType")', text=L["d/unit/GetUnitHasAuraType"] } )
 ----------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------
 dna.GetUnitHasBuffID=function(unit,aura,filter)
@@ -2163,7 +2208,7 @@ dna.GetSpellDamage=function(spell) -- Returns tooltipinitialdamagehit, tooltipti
 -- print( "  tooltipticktime="..tostring(tooltipticktime) )
 
 
-			dnaTooltip:Hide()
+			--dnaTooltip:Hide()
 		end
 	end
 	return tooltipinitialdamagehit, tooltiptickamount, tooltipticktime
@@ -2432,35 +2477,33 @@ tinsert( dna.D.criteriatree[SPELL_CRITERIA].children, { value='dna.CreateCriteri
 dna.D.InitCriteriaClassTree=function()
 	dna.D.class = {}
 	--COMMON CLASS CRITERIA--------------------------------------------------------------------------------------------------
-		dna.GetWeaponEnchant=function(slot, spell)
-			spell = dna.GetSpellName( spell )
-			local hasMainHandEnchant, _, _, hasOffHandEnchant, _, _, hasThrownEnchant, _, _ = GetWeaponEnchantInfo()
-			if ( slot and strlower(slot) == 'mainhand' ) then
-				slot = 16
-				if ( not hasMainHandEnchant) then return false end
-			elseif ( slot and strlower(slot) == 'offhand' ) then
-				slot = 17
-				if ( not hasOffHandEnchant) then return false end
-			elseif ( slot and strlower(slot) == 'thrown' ) then
-				slot = 18
-				if ( not hasThrownEnchant) then return false end
-			end
-			dnaTooltip:SetOwner(UIParent, "ANCHOR_NONE")
-			dnaTooltip:SetInventoryItem("player", slot)
-			local _parsedline = nil
+		dna.GetWeaponEnchant=function(slot, enchantid)
+			dna.D.ResetDebugTimer()
 			local lSpellFound = false
-			for _ttline = 1, dnaTooltip:NumLines() do
-				if ( _G["dnaTooltipTextLeft".._ttline] ) then _parsedline = ""..(_G["dnaTooltipTextLeft".._ttline]:GetText() or ""); end
-				if ( _G["dnaTooltipTextRight".._ttline] ) then _parsedline = _parsedline..(_G["dnaTooltipTextRight".._ttline]:GetText() or ""); end
-				if ( not dna.IsBlank( _parsedline ) and strfind(_parsedline, spell) ) then lSpellFound = true; break end
+
+			local hasMainHandEnchant, mainHandExpiration, mainHandCharges, mainHandEnchantID, hasOffHandEnchant, offHandExpiration, offHandCharges, offHandEnchantID = GetWeaponEnchantInfo()
+			--mainHandEnchantID = the spell ID of the main hand enchantment (new in 6.0)
+			--offHandEnchantID = the spell ID of the off hand enchantment (new in 6.0)
+			--/dump GetWeaponEnchantInfo()	
+			
+			if ( slot and strlower(slot) == 'mainhand' ) then
+				if ( enchantid == mainHandEnchantID ) then
+					lSpellFound = true
+				end
+			elseif ( slot and strlower(slot) == 'offhand' ) then
+				if ( enchantid == offHandEnchantID ) then
+					lSpellFound = true
+				end
 			end
-			dnaTooltip:Hide()
+			
+			dna.AppendActionDebug( 'GetWeaponEnchant(slot='..tostring(slot)..',main='..tostring(mainHandEnchantID)..',offhand='..tostring(offHandEnchantID)..')='..tostring(lSpellFound) )
+	
 			return lSpellFound
 		end
-		dna.D.criteria["d/class/common/GetWeaponEnchant"]={--Get weapon enchant
+		dna.D.criteria["d/class/common/GetWeaponEnchant"]={
 			a=2,
 			a1l=L["d/common/ws/l"],a1dv="mainhand",a1tt=L["d/common/ws/tt"],
-			a2l=L["d/common/sp/l"],a2dv=32910,a2tt=L["d/common/sp/tt"],
+			a2l=L["d/common/enchantid/l"],a2dv=L["d/common/enchantid/dv"],a2tt=L["d/common/enchantid/tt"],
 			f=function () return format('dna.GetWeaponEnchant(%q,%q)', dna.ui["ebArg1"]:GetText(), dna.ui["ebArg2"]:GetText()) end,
 		}
 	if (dna.D.PClass == "DEATHKNIGHT") then---------------------------------------------------------------------------------

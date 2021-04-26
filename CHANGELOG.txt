@@ -1,6 +1,8 @@
-commit 2871e980ba1b4a551c9e8da506d1fee38c662c83 (HEAD -> main)
+commit 473d145e3641cbb727eeef1f802394a51b2c6a1b (HEAD -> main)
 Author: carboncope <>
-Date:   Sat Apr 17 09:02:15 2021 -0600
+Date:   Sun Apr 25 19:38:22 2021 -0600
 
-    1.0.26
-    Added player/GetPlayerDamageTakenInLast5Seconds
+    1.0.27
+    Added unit/GetUnitHasAuraType
+    Added HasBuff
+    Fixed a bug with dna.GetWeaponEnchant causing tooltip to flicker
