@@ -1,8 +1,8 @@
-commit 473d145e3641cbb727eeef1f802394a51b2c6a1b (HEAD -> main)
+commit 92e9828d074424cfd5d8205c9e1ca987e9c8806c (HEAD -> main)
 Author: carboncope <>
-Date:   Sun Apr 25 19:38:22 2021 -0600
+Date:   Sat Sep 25 08:27:54 2021 -0600
 
-    1.0.27
-    Added unit/GetUnitHasAuraType
-    Added HasBuff
-    Fixed a bug with dna.GetWeaponEnchant causing tooltip to flicker
+    1.0.28
+    Added Show highest priority keybind on center of screen option
+    Fixed GetUnitCastingDuration
+    Set action texture to fixed 32 pixels width and 32 pixels height

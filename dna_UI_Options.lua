@@ -21,5 +21,17 @@ function dna.CreateOptionsPanel()
 		PrintHighestPriority:SetValue( dna.D.OTM[dna.D.PClass].bPrintSpells)
 	end
 
+	local ShowHighestKeybind = dna.lib_acegui:Create("CheckBox")
+	dna.ui.sgMain.tgMain.sgPanel:AddChild( ShowHighestKeybind )
+	ShowHighestKeybind:SetLabel( L["options/cbShowHighestKeybind/l"] )
+	ShowHighestKeybind:SetWidth(400)
+	ShowHighestKeybind:SetPoint("TOPLEFT", dna.ui.sgMain.tgMain.sgPanel.frame, "TOPLEFT", 0, -20)
+	ShowHighestKeybind:SetCallback( "OnValueChanged", function(self) dna.D.OTM[dna.D.PClass].bShowHighestKeybind = self:GetValue() end )
+	if (dna.IsBlank(dna.D.OTM[dna.D.PClass].bShowHighestKeybind)) then
+		ShowHighestKeybind:SetValue(false)
+		dna.D.OTM[dna.D.PClass].bShowHighestKeybind=false
+	else
+		ShowHighestKeybind:SetValue( dna.D.OTM[dna.D.PClass].bShowHighestKeybind)
+	end
 end
 

@@ -198,7 +198,7 @@ function dna:OnEnable()
 	
 	dna.frmRunning = CreateFrame("Frame","dna.frmRunning",UIParent);
 	dna.frmRunning:ClearAllPoints();
-	dna.frmRunning:SetPoint("CENTER", UIParent, "CENTER")
+    dna.frmRunning:SetPoint("CENTER", UIParent, "CENTER")
 	dna.frmRunning:SetFrameStrata("TOOLTIP")
 	dna.frmRunning:SetWidth(32);
 	dna.frmRunning:SetHeight(32);
@@ -211,7 +211,18 @@ function dna:OnEnable()
 	dna.txrRunning = dna.frmRunning:CreateTexture('dna.txrRunning', 'OVERLAY')
 	dna.txrRunning:ClearAllPoints()
 	dna.txrRunning:SetAllPoints(dna.frmRunning)
+	dna.txrRunning:SetWidth(32);
+	dna.txrRunning:SetHeight(32);
 	dna.txrRunning:SetTexture([[Interface\RAIDFRAME\ReadyCheck-Ready]])
+
+	-- Highest keybind text
+    dna.fsHighestKeybind = dna.frmRunning:CreateFontString("dna.fsHighestKeybind", 'BACKGROUND')
+	dna.fsHighestKeybind:ClearAllPoints()
+    dna.fsHighestKeybind:SetPoint("CENTER", dna.frmRunning, "CENTER", 0, -40)
+    dna.fsHighestKeybind:SetFont("Fonts\\FRIZQT__.TTF", 14)
+    dna.fsHighestKeybind:SetSize(17, 17)
+    dna.fsHighestKeybind:SetShadowOffset(2,-2)
+    dna.fsHighestKeybind:SetTextColor(1, 1, 1, 1)
 
     -- Out of range texts
     dna.fsMeleeRange = dna.frmRunning:CreateFontString("dna.fsMeleeRange", 'BACKGROUND')
@@ -253,6 +264,12 @@ function dna:OnEnable()
 					break
 				end
 			end
+		end
+
+		if dna.D.OTM[dna.D.PClass].bShowHighestKeybind then
+			dna.fsHighestKeybind:SetText(dna.strPassingActionKeyBind)
+		else
+			dna.fsHighestKeybind:SetText("")
 		end
 		
 		if dna.nPassingActionASCII ~= dna.D.nLastPassingActionASCII then

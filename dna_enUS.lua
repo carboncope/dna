@@ -51,7 +51,8 @@ L["common/spellname/dv"]							= ""
 --*****************************************************
 --Options Panel
 --*****************************************************
-L["options/cbPrintHighestPriority/l"]			= "Print highest priority action to chat window"
+L["options/cbPrintHighestPriority/l"]	= "Print highest priority action to chat window"
+L["options/cbShowHighestKeybind/l"] = "Show highest priority keybind on center of screen"
 
 --*****************************************************
 --Lists Panel

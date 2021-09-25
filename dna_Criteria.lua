@@ -598,9 +598,9 @@ tinsert( dna.D.criteriatree[UNIT_CRITERIA].children, { value='dna.CreateCriteria
 dna.GetUnitCastingDuration=function(unit)
 	dna.D.ResetDebugTimer()
 	local lReturn = -1
-	local unitCasting, _, _, _, startTime, _, _, _, CantInterrupt = UnitCastingInfo(unit)
+	local unitCasting, _, _, startTime, _, _, _, _, CantInterrupt = UnitCastingInfo(unit)
 	if (not unitCasting) then
-		unitCasting, _, _, _, startTime, _, _, CantInterrupt = UnitChannelInfo(unit)
+		unitCasting, _, _, startTime, _, _, _, CantInterrupt = UnitChannelInfo(unit)
 	end
 	if ( unitCasting ) then
 		lReturn =  GetTime() - (startTime/1000)
