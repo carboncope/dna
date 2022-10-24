@@ -7,7 +7,6 @@ dna.ui					= {} 																		-- UI table
 dna.ElvUI				= nil
 local L      			= LibStub("AceLocale-3.0"):GetLocale("dna")
 local addon				= ...
-BINDING_HEADER_dna 	= GetAddOnMetadata(..., "Title");
 
 if ( ElvUI ) then
 	local EP 	 = LibStub("LibElvUIPlugin-1.0")
