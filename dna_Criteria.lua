@@ -2848,21 +2848,25 @@ end
 dna.GetTalentEnabled=function(talentName)
 	dna.D.ResetDebugTimer()
 	local lReturn = false
-	local talentInfo = {}
-    local maxTiers = 7
+
 	local specPos = GetSpecialization()	
 	if not specPos or specPos < 1 or specPos > 4 then
-		return lReturn
+		return lReturn -- Scenario for low levels that have no talent specialization options
 	end
-	
-    for tier = 1, maxTiers do
-        for col = 1, 3 do
-            local id, name, _, _, _, spellId, _, t, c, isSelected = GetTalentInfoBySpecialization(specPos, tier, col)
-			if (name and name == talentName and isSelected) then
+
+	for tier = 1, _G.MAX_TALENT_TIERS do
+		for column = 1, _G.NUM_TALENT_COLUMNS do
+			-- Get name and icon info for the current talent of the current class and save it
+			local talentID, name, iconTexture, selected, available1, _6, _7, _8, _9, known1, grantedByAura = GetTalentInfo(tier, column, GetActiveSpecGroup())
+			local _, _, _, _, available2, _, _, _, _, known2 = GetTalentInfoByID(talentID, GetActiveSpecGroup(), true);
+			-- dna:dprint("name="..tostring(name).." known1="..tostring(known1).." known2="..tostring(known2).." selected="..tostring(selected))
+			-- dna:dprint("  name="..tostring(name).." available1="..tostring(available1).." available2="..tostring(available2))
+		
+			if (name and name == talentName and (known1 or known2) ) then
 				lReturn = true
 				break
 			end
-        end
+		end
     end
 
 	dna.AppendActionDebug( 'GetTalentEnabled(talent='..tostring(talentName)..')='..tostring(lReturn) )

@@ -1,8 +1,8 @@
-## Interface: 90002
+## Interface: 100002
 ## Title: dna
 ## Notes: Rotation manager addon
 ## Author: carboncope
-## Version: 1.0.28
+## Version: 10.0.2.1
 ## SavedVariables: dna_ace_db
 
 embeds.xml
