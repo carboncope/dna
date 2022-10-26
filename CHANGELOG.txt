@@ -1,6 +1,9 @@
-commit 79f47605d1f5356a8fa70dd3ed0d5fffb7c631e0 (HEAD -> main)
+commit d270a3fdc932e4de0342e9d7cf708d9c133c8083 (HEAD -> main)
 Author: advrooster <advrooster@gmail.com>
-Date:   Mon Oct 24 10:41:47 2022 -0600
+Date:   Wed Oct 26 10:16:13 2022 -0600
 
-    10.0.2.2
-    Fixed dragonflight error: tried to call the protected function 'SpellStopCasting' when changing keybinds
+    10.0.2.3
+    Removed GetTalentEnabled
+    Added GetTalentRank
+    Rotation breaking change you must change GetTalentEnabled("talent name") to GetTalentRank("talent name")>0
+    Confirmed the new GetTalentRank works in dragonflight prepatch retail

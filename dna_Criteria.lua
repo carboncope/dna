@@ -2677,7 +2677,7 @@ dna.D.InitCriteriaClassTree=function()
 			end
 
 			if ( lSpecialization == 2 ) then --protection
-				if ( dna.GetTalentEnabled(171648) and dna.GetSpellCooldown(119072) < lShortestTime ) then --sanctified wrath, holy wrath
+				if ( dna.GetTalentRank(171648)>0 and dna.GetSpellCooldown(119072) < lShortestTime ) then --sanctified wrath, holy wrath
 					lShortestTime = dna.GetSpellCooldown(119072)
 				end
 			elseif (lSpecialization == 3 ) then --retribution
@@ -2845,39 +2845,49 @@ end
 --********************************************************************************************
 --TALENTS CRITERIA
 --********************************************************************************************
-dna.GetTalentEnabled=function(talentName)
+dna.GetTalentRank=function(talentName)
 	dna.D.ResetDebugTimer()
-	local lReturn = false
+	local lReturn = 0
 
 	local specPos = GetSpecialization()	
 	if not specPos or specPos < 1 or specPos > 4 then
 		return lReturn -- Scenario for low levels that have no talent specialization options
 	end
 
-	for tier = 1, _G.MAX_TALENT_TIERS do
-		for column = 1, _G.NUM_TALENT_COLUMNS do
-			-- Get name and icon info for the current talent of the current class and save it
-			local talentID, name, iconTexture, selected, available1, _6, _7, _8, _9, known1, grantedByAura = GetTalentInfo(tier, column, GetActiveSpecGroup())
-			local _, _, _, _, available2, _, _, _, _, known2 = GetTalentInfoByID(talentID, GetActiveSpecGroup(), true);
-			-- dna:dprint("name="..tostring(name).." known1="..tostring(known1).." known2="..tostring(known2).." selected="..tostring(selected))
-			-- dna:dprint("  name="..tostring(name).." available1="..tostring(available1).." available2="..tostring(available2))
-		
-			if (name and name == talentName and (known1 or known2) ) then
-				lReturn = true
-				break
-			end
-		end
-    end
+    local specID = PlayerUtil.GetCurrentSpecID()
+    local configID = C_ClassTalents.GetLastSelectedSavedConfigID(specID) or C_ClassTalents.GetActiveConfigID()     -- last selected configID or fall back to default spec config   
+    local configInfo = C_Traits.GetConfigInfo(configID)
+    local treeID = configInfo.treeIDs[1]
+    local nodes = C_Traits.GetTreeNodes(treeID)
 
-	dna.AppendActionDebug( 'GetTalentEnabled(talent='..tostring(talentName)..')='..tostring(lReturn) )
+    for _, nodeID in ipairs(nodes) do
+        local nodeInfo = C_Traits.GetNodeInfo(configID, nodeID)
+        if nodeInfo.currentRank and nodeInfo.currentRank > 0 then
+            local entryID = nodeInfo.activeEntry and nodeInfo.activeEntry.entryID and nodeInfo.activeEntry.entryID
+            local entryInfo = entryID and C_Traits.GetEntryInfo(configID, entryID)
+            local definitionInfo = entryInfo and entryInfo.definitionID and C_Traits.GetDefinitionInfo(entryInfo.definitionID)
+
+            if definitionInfo ~= nil then
+                local name = TalentUtil.GetTalentName(definitionInfo.overrideName, definitionInfo.spellID)
+				if (name and name == talentName ) then
+					lReturn = nodeInfo.currentRank
+					break
+				end
+            end
+        end
+    end
+	
+	dna.AppendActionDebug( 'GetTalentRank(talentName='..tostring(talentName)..')='..tostring(lReturn) )
 	return lReturn
 end
-dna.D.criteria["d/talents/GetTalentEnabled"]={
-	a=1,
+dna.D.criteria["d/talents/GetTalentRank"]={
+	a=3,
 	a1l=L["d/common/ta"],a1dv=L["d/common/tadv"],a1tt=L["d/common/tatt"],
-	f=function () return format('dna.GetTalentEnabled(%q)', dna.ui["ebArg1"]:GetText()) end,
+    a2l=L["d/common/co/l"],a2dv=">=",a2tt=L["d/common/co/tt"],
+	a3l=L["d/common/rank/l"],a3dv="1",a3tt=L["d/common/rank/tt"],
+	f=function () return format('dna.GetTalentRank(%q)%s%s', dna.ui["ebArg1"]:GetText(), dna.ui["ebArg2"]:GetText(), dna.ui["ebArg3"]:GetText()) end,
 }
-tinsert( dna.D.criteriatree[TALENTS_CRITERIA].children, { value='dna.CreateCriteriaPanel("d/talents/GetTalentEnabled")', text=L["d/talents/GetTalentEnabled"] } )
+tinsert( dna.D.criteriatree[TALENTS_CRITERIA].children, { value='dna.CreateCriteriaPanel("d/talents/GetTalentRank")', text=L["d/talents/GetTalentRank"] } )
 --********************************************************************************************
 --MISC CRITERIA
 --********************************************************************************************

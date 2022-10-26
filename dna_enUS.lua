@@ -35,6 +35,7 @@ L["common/error/numbers"]						= "Error: %s cannot contain only numbers"
 L["common/error/renamedefault"]					= "Error: %s is a default and cannot be renamed"
 L["common/error/spellnotfoundwh"]				= "Error: %s spell not found. Try using spell id from Wowhead."
 L["common/error/itemnotfoundwh"]				= "Error: %s item not found. Try using item id from Wowhead."
+
 -- L["common/error/anchor1"]						= "Cannot move anchor in combat"
 -- L["common/error/anchor2"]						= "Use ElvUI to move the dna anchor"
 L["common/error/deleteincombat"]				= "Cannot delete in combat"
@@ -314,6 +315,8 @@ L["d/common/power/tt"]							= "Enter powertype (case sensitive):"..
 																"|cffF95C25\nNumPowerTypesr"
 L["d/common/ppm/l"]								= "PPM:"
 L["d/common/ppm/tt"]							= "Enter the procs per minute |cffF95C252.6|r"
+L["d/common/rank/l"]							= "Rank:"
+L["d/common/rank/tt"]							= "Enter the rank number |cffF95C251|r"
 L["d/common/seconds/l"]							= "Seconds:"
 L["d/common/seconds/tt"]						= "Enter the number of seconds |cffF95C252.5|r"
 L["d/common/slot/l"]							= "Slot:"
@@ -559,7 +562,7 @@ L["d/class"]									= "Class"
 	L["d/class/warrior/rage/tt"]								= "Enter the amount of rage |cffF95C25110|r"
 --TALENTS----------------------------------------------
 L["d/talents"]														= "Talents"
-	L["d/talents/GetTalentEnabled"]	= "Player has |cffF95C25<talent name>|r enabled"
+	L["d/talents/GetTalentRank"]	= "Talent |cffF95C25<talent name>|r  rank is |cffF95C25<operator>|r |cffF95C25<number>|r"
 --MISC-------------------------------------------------
 L["d/misc"]														= "Misc"
 	L["d/misc/an/l"]												= "Action Name:"
@@ -594,6 +597,7 @@ L["d/group"]									= "Group"
 	L["d/group/GetSpellNumberOfGroupMembersApplied"] = "Number of group members with my |cffF95C25<buffname>|r applied is |cffF95C25<operator>|r |cffF95C25<number>|r"
 	L["d/group/GetNumberOfGroupMembersMissingBuff"] = "Number of group members missing |cffF95C25<buffname>|r is |cffF95C25<operator>|r |cffF95C25<number>|r"
 	L["d/group/GetSpellNumberOfUnitsApplied"]	= "|cffF95C25<spell>|r is applied on |cffF95C25<operator>|r |cffF95C25<number>|r of units"
+
 
 
 
