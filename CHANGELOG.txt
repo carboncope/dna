@@ -1,9 +1,6 @@
-commit d270a3fdc932e4de0342e9d7cf708d9c133c8083 (HEAD -> main)
+commit ef9b6e1f85d396f7d80ddaa5b610431489e628c9 (HEAD -> main)
 Author: advrooster <advrooster@gmail.com>
-Date:   Wed Oct 26 10:16:13 2022 -0600
+Date:   Sun Oct 30 11:20:46 2022 -0600
 
-    10.0.2.3
-    Removed GetTalentEnabled
-    Added GetTalentRank
-    Rotation breaking change you must change GetTalentEnabled("talent name") to GetTalentRank("talent name")>0
-    Confirmed the new GetTalentRank works in dragonflight prepatch retail
+    10.0.2.4
+    Defaulted green checkmark (DNA debug keybind) to hide

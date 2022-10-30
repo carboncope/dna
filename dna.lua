@@ -206,14 +206,16 @@ function dna:OnEnable()
 	dna.frmRunning:EnableMouse(false)
 	dna.frmRunning:Show()
 	dna.frmRunning:SetAlpha(1)
-
+	
 	dna.txrRunning = dna.frmRunning:CreateTexture('dna.txrRunning', 'OVERLAY')
 	dna.txrRunning:ClearAllPoints()
 	dna.txrRunning:SetAllPoints(dna.frmRunning)
 	dna.txrRunning:SetWidth(32);
 	dna.txrRunning:SetHeight(32);
 	dna.txrRunning:SetTexture([[Interface\RAIDFRAME\ReadyCheck-Ready]])
-
+	dna.nEnabled0Off1On = 0
+    dna.txrRunning:SetAlpha(0)	-- Hide green checkmark
+	
 	-- Highest keybind text
     dna.fsHighestKeybind = dna.frmRunning:CreateFontString("dna.fsHighestKeybind", 'BACKGROUND')
 	dna.fsHighestKeybind:ClearAllPoints()
